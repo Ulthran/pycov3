@@ -1,4 +1,4 @@
-"""Python setup.py for project_name package"""
+"""Python setup.py for pycov3 package"""
 import io
 import os
 from setuptools import find_packages, setup
@@ -6,7 +6,7 @@ from setuptools import find_packages, setup
 
 def read(*paths, **kwargs):
     """Read the contents of a text file safely.
-    >>> read("project_name", "VERSION")
+    >>> read("pycov3", "VERSION")
     '0.1.0'
     >>> read("README.md")
     ...
@@ -30,17 +30,17 @@ def read_requirements(path):
 
 
 setup(
-    name="project_name",
-    version=read("project_name", "VERSION"),
-    description="project_description",
-    url="https://github.com/author_name/project_urlname/",
+    name="pycov3",
+    version=read("pycov3", "VERSION"),
+    description="Awesome pycov3 created by Ulthran",
+    url="https://github.com/Ulthran/pycov3/",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
-    author="author_name",
+    author="Ulthran",
     packages=find_packages(exclude=["tests", ".github"]),
     install_requires=read_requirements("requirements.txt"),
     entry_points={
-        "console_scripts": ["project_name = project_name.__main__:main"]
+        "console_scripts": ["pycov3 = pycov3.__main__:main"]
     },
     extras_require={"test": read_requirements("requirements-test.txt")},
 )
