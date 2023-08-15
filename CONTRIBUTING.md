@@ -67,7 +67,7 @@ Run `git push origin my_contribution`
 
 On github interface, click on `Pull Request` button.
 
-Wait CI to run and one of the developers will review your PR.
+Wait for CI to run and one of the developers will review your PR.
 ## Makefile utilities
 
 This project comes with a `Makefile` that contains a number of useful utility.

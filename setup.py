@@ -32,11 +32,11 @@ def read_requirements(path):
 setup(
     name="pycov3",
     version=read("pycov3", "VERSION"),
-    description="Awesome pycov3 created by Ulthran",
+    description="Generate cov3 files used in DEMIC",
     url="https://github.com/Ulthran/pycov3/",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
-    author="Ulthran",
+    author="Charlie Bushman",
     packages=find_packages(exclude=["tests", ".github"]),
     install_requires=read_requirements("requirements.txt"),
     entry_points={
