@@ -4,6 +4,7 @@ from pathlib import Path
 
 from .File import FastaFile, SamFile
 
+
 class Directory(ABC):
     def __init__(self, fp: Path, overwrite: bool) -> None:
         super().__init__()
@@ -17,20 +18,26 @@ class Directory(ABC):
             logging.error(f"{self.fp} is not a directory")
             raise ValueError
         if any(self.fp.iterdir()) and not self.overwrite:
-            logging.error(f"{self.fp} is a non-empty directory, please either point output to an empty or non-existent directory or run with the overwrite flag")
+            logging.error(
+                f"{self.fp} is a non-empty directory, please either point output to an empty or non-existent directory or run with the overwrite flag"
+            )
             raise ValueError
-        
-    
-    
+
+
 class FastaDir(Directory):
     def __init__(self, fp: Path, overwrite: bool, coverage_params: dict) -> None:
         super().__init__(fp, overwrite)
 
-        self.fastas = [FastaFile(x, coverage_params) for x in self.fp.iterdir() if x.endswith((".fasta", ".fa", ".fna"))]
+        self.fastas = [
+            FastaFile(x, coverage_params)
+            for x in self.fp.iterdir()
+            if x.endswith((".fasta", ".fa", ".fna"))
+        ]
         if not self.fastas:
             logging.error(f"No files found ending in .fasta, .fa, or .fna in {self.fp}")
             raise ValueError
-        
+
+
 class SamDir(Directory):
     def __init__(self, fp: Path, overwrite: bool) -> None:
         super().__init__(fp, overwrite)
@@ -39,6 +46,22 @@ class SamDir(Directory):
         if not self.sams:
             logging.error(f"No files found ending in .sam in {self.fp}")
             raise ValueError
-    
+
     def calculate_edge_length(self) -> int:
-        return 0
+        edge_length = 0
+        for sam in self.sams:
+            checks = 0
+            for line in sam.parse():
+                cutoff = 0
+                for index, char in enumerate(line.cigar):
+                    if not char.isdigit():
+                        cutoff = index
+                cigar_val = int(line.cigar[:cutoff])
+                if cigar_val > edge_length:
+                    edge_length = cigar_val
+
+                checks += 1
+                if checks > 100:
+                    break
+
+        return edge_length

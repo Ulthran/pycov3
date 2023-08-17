@@ -20,24 +20,54 @@ from .Directory import FastaDir, SamDir
 # 6. Output
 ###
 
+
 def main(argv=None):
     p = argparse.ArgumentParser()
+    p.add_argument("-S", "--sam_dir", help="the directory containing the sam file(s)")
     p.add_argument(
-        "-S", "--sam_dir", help="the directory containing the sam file(s)"
+        "-F", "--fasta_dir", help="the directory containing the binned fasta file(s)"
     )
-    p.add_argument("-F", "--fasta_dir", help="the directory containing the binned fasta file(s)")
     p.add_argument(
-        "-O", "--out_dir",
+        "-O",
+        "--out_dir",
         help="the output directory",
     )
-    p.add_argument("-X", "--overwrite", help="overwrites any existing outputs", action="store_true")
-    
-    p.add_argument("-W", "--window_size", help="size (nt) of window for calculation of coverage (default: 5000)")
-    p.add_argument("-D", "--window_step", help="step (nt) of window for calculation of coverage (default: 100)")
-    p.add_argument("-M", "--mapq_cutoff", help="cutoff of mapping quality when calculating coverages (default: 5)")
-    p.add_argument("-L", "--mapl_cutoff", help="cutoff of mapping length when calculating coverages (default: 50)")
-    p.add_argument("-R", "--max_mismatch_ratio", help="maximum of mismatch ratio for each read as a hit (default: 0.03)", default=0.03)
-    p.add_argument("-T", "--thread_num", help="set number of threads for parallel running (default: 1)", default=1)
+    p.add_argument(
+        "-X", "--overwrite", help="overwrites any existing outputs", action="store_true"
+    )
+
+    p.add_argument(
+        "-W",
+        "--window_size",
+        help="size (nt) of window for calculation of coverage (default: 5000)",
+    )
+    p.add_argument(
+        "-D",
+        "--window_step",
+        help="step (nt) of window for calculation of coverage (default: 100)",
+    )
+    p.add_argument(
+        "-M",
+        "--mapq_cutoff",
+        help="cutoff of mapping quality when calculating coverages (default: 5)",
+    )
+    p.add_argument(
+        "-L",
+        "--mapl_cutoff",
+        help="cutoff of mapping length when calculating coverages (default: 50)",
+    )
+    p.add_argument(
+        "-R",
+        "--max_mismatch_ratio",
+        help="maximum of mismatch ratio for each read as a hit (default: 0.03)",
+        default=0.03,
+    )
+    p.add_argument(
+        "-T",
+        "--thread_num",
+        help="set number of threads for parallel running (default: 1)",
+        default=1,
+    )
 
     p.add_argument(
         "-G",
@@ -56,8 +86,13 @@ def main(argv=None):
 
     sam_d = SamDir(args.S, args.X)
 
-    coverage_params = {"window_size": args.W, "window_step": args.D, "edge_length": sam_d.calculate_edge_length, "mapq_cutoff": args.M, "mapl_cutoff": args.L}
-    coverage_params = {k:v for k, v in coverage_params.items() if v is not None}
+    coverage_params = {
+        "window_size": args.W,
+        "window_step": args.D,
+        "edge_length": sam_d.calculate_edge_length,
+        "mapq_cutoff": args.M,
+        "mapl_cutoff": args.L,
+    }
+    coverage_params = {k: v for k, v in coverage_params.items() if v is not None}
 
     fasta_d = FastaDir(args.F, args.X, coverage_params)
-
