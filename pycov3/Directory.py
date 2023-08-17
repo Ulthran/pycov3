@@ -25,7 +25,9 @@ class Directory(ABC):
 
 
 class FastaDir(Directory):
-    def __init__(self, fp: Path, overwrite: bool, coverage_params: dict) -> None:
+    def __init__(
+        self, fp: Path, overwrite: bool, coverage_params: dict
+    ) -> None:
         super().__init__(fp, overwrite)
 
         self.fastas = [
@@ -34,7 +36,9 @@ class FastaDir(Directory):
             if x.endswith((".fasta", ".fa", ".fna"))
         ]
         if not self.fastas:
-            logging.error(f"No files found ending in .fasta, .fa, or .fna in {self.fp}")
+            logging.error(
+                f"No files found ending in .fasta, .fa, or .fna in {self.fp}"
+            )
             raise ValueError
 
 
@@ -42,7 +46,9 @@ class SamDir(Directory):
     def __init__(self, fp: Path, overwrite: bool) -> None:
         super().__init__(fp, overwrite)
 
-        self.sams = [SamFile(x) for x in self.fp.iterdir() if x.endswith(".sam")]
+        self.sams = [
+            SamFile(x) for x in self.fp.iterdir() if x.endswith(".sam")
+        ]
         if not self.sams:
             logging.error(f"No files found ending in .sam in {self.fp}")
             raise ValueError

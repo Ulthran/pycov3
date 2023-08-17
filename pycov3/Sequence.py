@@ -38,7 +38,9 @@ class Contig(Sequence):
             )
             raise ValueError
         if self.window_size < self.window_step * 2:
-            logging.error(f"Window size must be at least twice the window step value")
+            logging.error(
+                f"Window size must be at least twice the window step value"
+            )
             raise ValueError
         if self.window_size % self.window_step != 0:
             logging.error(f"Window step must evenly divide window size")
@@ -53,5 +55,7 @@ class Contig(Sequence):
     def calculate_GC_skew(self):
         gc_skew = [0]
         for i in range(1, len(self.seq)):
-            gc_skew.append(gc_skew[i - 1] + (self.seq[i] == "G") - (self.seq[i] == "C"))
+            gc_skew.append(
+                gc_skew[i - 1] + (self.seq[i] == "G") - (self.seq[i] == "C")
+            )
         self.gc_skew = gc_skew

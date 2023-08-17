@@ -23,9 +23,13 @@ from .Directory import FastaDir, SamDir
 
 def main(argv=None):
     p = argparse.ArgumentParser()
-    p.add_argument("-S", "--sam_dir", help="the directory containing the sam file(s)")
     p.add_argument(
-        "-F", "--fasta_dir", help="the directory containing the binned fasta file(s)"
+        "-S", "--sam_dir", help="the directory containing the sam file(s)"
+    )
+    p.add_argument(
+        "-F",
+        "--fasta_dir",
+        help="the directory containing the binned fasta file(s)",
     )
     p.add_argument(
         "-O",
@@ -33,7 +37,10 @@ def main(argv=None):
         help="the output directory",
     )
     p.add_argument(
-        "-X", "--overwrite", help="overwrites any existing outputs", action="store_true"
+        "-X",
+        "--overwrite",
+        help="overwrites any existing outputs",
+        action="store_true",
     )
 
     p.add_argument(
@@ -93,6 +100,8 @@ def main(argv=None):
         "mapq_cutoff": args.M,
         "mapl_cutoff": args.L,
     }
-    coverage_params = {k: v for k, v in coverage_params.items() if v is not None}
+    coverage_params = {
+        k: v for k, v in coverage_params.items() if v is not None
+    }
 
     fasta_d = FastaDir(args.F, args.X, coverage_params)
