@@ -1,8 +1,9 @@
 import argparse
 import logging
 import sys
+from pathlib import Path
 
-from .Directory import FastaDir, SamDir
+from .Directory import FastaDir, SamDir, Cov3Dir
 
 ###
 # Main steps:
@@ -85,23 +86,33 @@ def main(argv=None):
     )
 
     args = p.parse_args(argv)
-    if not (args.S and args.F and args.O):
+    if not (args.sam_dir and args.fasta_dir and args.out_dir):
         p.print_help(sys.stderr)
         sys.exit(1)
     logging.basicConfig()
     logging.getLogger().setLevel(args.log_level)
 
-    sam_d = SamDir(args.S, args.X)
+    sam_d = SamDir(Path(args.sam_dir), args.overwrite)
 
+    window_params = {
+        "window_size": args.window_size,
+        "window_step": args.window_step,
+        "edge_length": sam_d.calculate_edge_length(),
+    }
     coverage_params = {
-        "window_size": args.W,
-        "window_step": args.D,
-        "edge_length": sam_d.calculate_edge_length,
-        "mapq_cutoff": args.M,
-        "mapl_cutoff": args.L,
+        "mapq_cutoff": args.mapq_cutoff,
+        "mapl_cutoff": args.mapl_cutoff,
+        "max_mismatch_ratio": args.max_mismatch_ratio,
+    }
+    window_params = {
+        k: v for k, v in window_params.items() if v is not None
     }
     coverage_params = {
         k: v for k, v in coverage_params.items() if v is not None
     }
 
-    fasta_d = FastaDir(args.F, args.X, coverage_params)
+    fasta_d = FastaDir(Path(args.fasta_dir), args.overwrite, window_params)
+
+    cov3_d = Cov3Dir(Path(args.out_dir), args.overwrite, fasta_d.get_filenames(), coverage_params)
+
+    cov3_d.generate(sam_d, fasta_d)

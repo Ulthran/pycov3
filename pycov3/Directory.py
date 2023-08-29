@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from .File import FastaFile, SamFile
+from .File import FastaFile, SamFile, Cov3File
 
 
 class Directory(ABC):
@@ -10,59 +10,63 @@ class Directory(ABC):
         super().__init__()
         self.fp = fp.resolve()
         self.overwrite = overwrite
+        self.files = []
 
-        if not fp.exists():
-            logging.info(f"{self.fp} does not exist, creating it now")
-            self.fp.mkdir(parents=True, exist_ok=True)
         if not fp.is_dir():
             logging.error(f"{self.fp} is not a directory")
             raise ValueError
-        if any(self.fp.iterdir()) and not self.overwrite:
-            logging.error(
-                f"{self.fp} is a non-empty directory, please either point output to an empty or non-existent directory or run with the overwrite flag"
-            )
-            raise ValueError
+    
+    def get_filenames(self) -> list:
+        return [".".join(f.fp.name.split(".")[:-1]) for f in self.files]
 
 
 class FastaDir(Directory):
     def __init__(
-        self, fp: Path, overwrite: bool, coverage_params: dict
+        self, fp: Path, overwrite: bool, window_params: dict
     ) -> None:
         super().__init__(fp, overwrite)
 
-        self.fastas = [
-            FastaFile(x, coverage_params)
+        self.files = [
+            FastaFile(x, window_params)
             for x in self.fp.iterdir()
-            if x.endswith((".fasta", ".fa", ".fna"))
+            if str(x).endswith((".fasta", ".fa", ".fna"))
         ]
-        if not self.fastas:
+        if not self.files:
             logging.error(
                 f"No files found ending in .fasta, .fa, or .fna in {self.fp}"
             )
             raise ValueError
+    
+    def get_bin(self, bin: str) -> FastaFile:
+        fasta_l = [f for f in self.files if f.bin == bin]
+        if len(fasta_l) != 1:
+            logging.error(f"Found 0 or more than 1 matches for bin {bin} in FASTAs")
+            raise ValueError
+        return fasta_l[0]
 
 
 class SamDir(Directory):
     def __init__(self, fp: Path, overwrite: bool) -> None:
         super().__init__(fp, overwrite)
 
-        self.sams = [
-            SamFile(x) for x in self.fp.iterdir() if x.endswith(".sam")
+        self.files = [
+            SamFile(x) for x in self.fp.iterdir() if str(x).endswith(".sam")
         ]
-        if not self.sams:
+        if not self.files:
             logging.error(f"No files found ending in .sam in {self.fp}")
             raise ValueError
 
     def calculate_edge_length(self) -> int:
         edge_length = 0
-        for sam in self.sams:
+        for sam in self.files:
             checks = 0
             for line in sam.parse():
                 cutoff = 0
-                for index, char in enumerate(line.cigar):
+                for index, char in enumerate(line["cigar"]):
                     if not char.isdigit():
                         cutoff = index
-                cigar_val = int(line.cigar[:cutoff])
+                        break
+                cigar_val = int(line["cigar"][:cutoff])
                 if cigar_val > edge_length:
                     edge_length = cigar_val
 
@@ -71,3 +75,26 @@ class SamDir(Directory):
                     break
 
         return edge_length
+
+    def get_bin(self, bin: str) -> list:
+        return [s for s in self.files if s.bin == bin]
+
+
+class Cov3Dir(Directory):
+    def __init__(self, fp: Path, overwrite: bool, fns: list, coverage_params: dict) -> None:
+        super().__init__(fp, overwrite)
+
+        if not fp.exists():
+            logging.info(f"{self.fp} does not exist, creating it now")
+            self.fp.mkdir(parents=True, exist_ok=True)
+        if any(self.fp.iterdir()) and not self.overwrite:
+            logging.error(
+                f"{self.fp} is a non-empty directory, please either point output to an empty or non-existent directory or run with the overwrite flag"
+            )
+            raise ValueError
+
+        self.files = [Cov3File(fp / f"{fn}.cov3", fn.split(".")[-1], **coverage_params) for fn in fns]
+    
+    def generate(self, sam_d: SamDir, fasta_d: FastaDir):
+        for cov3 in self.files:
+            cov3.write(sam_d.get_bin(cov3.bin), fasta_d.get_bin(cov3.bin))
