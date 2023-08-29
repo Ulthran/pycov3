@@ -1,5 +1,6 @@
 import logging
 import math
+import sys
 from abc import ABC, abstractmethod
 from itertools import groupby
 from pathlib import Path
@@ -62,6 +63,9 @@ class FastaFile(File):
 
     def generate_contigs(self):
         self.contigs = {n: Contig(n, s, **self.window_params) for n, s in self.parse()}
+        num_too_small = sum(1 for c in self.contigs.values() if c.windows)
+        total_contigs = len(self.contigs)
+        logging.info(f"For FASTA {self.fp}, {num_too_small} contigs of {total_contigs} are ignored for being too small")
 
 
 """
@@ -91,12 +95,13 @@ class SamFile(File):
                 position = int(fields[3])
                 mapping_quality = int(fields[4])
                 cigar = fields[5]
-                # Find XM field for mismatches
                 mismatch = 0
-                for i in [13, 14, 15, 12, 11]:
-                    if fields[i].split(":") == "XM":
-                        mismatch = int(fields[i].split(":")[2])
-                        break
+                if reference_name != "*":
+                    # Find XM field for mismatches
+                    for i in [13, 14, 15, 12, 11]:
+                        if fields[i].split(":") == "XM":
+                            mismatch = int(fields[i].split(":")[2])
+                            break
 
                 parsed_read = {
                     "read_name": read_name,
@@ -143,12 +148,15 @@ class Cov3File(File):
             fasta.generate_contigs()
         
         with open(self.fp, "w") as f_out:
+            contigs_ignored, total_contigs = 0, 0
             for sam in sams:
                 sam_name = sam.fp.stem
                 current_contig = ""
                 coverages = {}
                 for line in sam.parse():
                     contig_name = line['reference_name']
+                    if contig_name == "*":
+                        break
                     contig = fasta.contigs[contig_name]
                     contig_len = contig.seq_len
                     edge_length = contig.edge_length
@@ -169,13 +177,13 @@ class Cov3File(File):
 
                             for step in range(first_step, last_step):
                                 if step in coverages.keys():
-                                    cov_step.push(coverages[step])
+                                    cov_step.append(coverages[step])
                                     cov_window_sum += coverages[step]
                                 else:
-                                    cov_step.push(0)
+                                    cov_step.append(0)
 
                                 if len(cov_step) == window_size / window_step:
-                                    avg_cov_window = cov_window_sum / window_size
+                                    avg_cov_window = cov_window_sum / window_size + sys.float_info.min # Calculate avg and make sure it's non-zero
                                     log_cov = math.log(avg_cov_window) / math.log(2)
                                     window = contig.windows[n]
                                     gc_content = window.gc_content
@@ -186,7 +194,7 @@ class Cov3File(File):
 
                             if n >= self.min_window_count and len(qualified_info) == n:
                                 for info in qualified_info:
-                                    f_out.write(info)
+                                    f_out.write(f"{info}\n")
 
                             coverages = {}
                         
@@ -196,10 +204,20 @@ class Cov3File(File):
                             start_step = int((line["position"] - 1 - edge_length) / window_step)
                             end_step = int((line["position"] - 1 + mapl - edge_length) / window_step)
 
-                            coverages[start_step] += window_step - ((line["position"] - 1 - edge_length) % window_step)
-                            coverages[end_step] += (line["position"] - 1 + mapl - edge_length) % window_step
+                            if start_step not in coverages:
+                                coverages[start_step] = window_step - ((line["position"] - 1 - edge_length) % window_step)
+                            else:
+                                coverages[start_step] += window_step - ((line["position"] - 1 - edge_length) % window_step)
+                            if end_step not in coverages:
+                                coverages[end_step] = (line["position"] - 1 + mapl - edge_length) % window_step
+                            else:
+                                coverages[end_step] += (line["position"] - 1 + mapl - edge_length) % window_step
+                            
                             for step in range(start_step + 1, end_step):
-                                coverages[step] += window_step
+                                if step not in coverages:
+                                    coverages[step] = window_step
+                                else:
+                                    coverages[step] += window_step
     
     @staticmethod
     def calculate_mapl(cigar: str) -> int:
