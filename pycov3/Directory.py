@@ -1,5 +1,5 @@
 import logging
-from abc import ABC, abstractmethod
+from abc import ABC
 from pathlib import Path
 
 from .File import FastaFile, SamFile, Cov3File
@@ -12,10 +12,10 @@ class Directory(ABC):
         self.overwrite = overwrite
         self.files = []
 
-        if not fp.is_dir():
+        if not fp.is_dir() and fp.exists():
             logging.error(f"{self.fp} is not a directory")
             raise ValueError
-    
+
     def get_filenames(self) -> list:
         return [".".join(f.fp.name.split(".")[:-1]) for f in self.files]
 
@@ -97,4 +97,4 @@ class Cov3Dir(Directory):
     
     def generate(self, sam_d: SamDir, fasta_d: FastaDir):
         for cov3 in self.files:
-            cov3.write(sam_d.get_bin(cov3.bin), fasta_d.get_bin(cov3.bin))
+            cov3.write(sam_d.files, fasta_d.get_bin(cov3.bin))

@@ -47,32 +47,38 @@ def main(argv=None):
     p.add_argument(
         "-W",
         "--window_size",
+        type=int,
         help="size (nt) of window for calculation of coverage (default: 5000)",
     )
     p.add_argument(
         "-D",
         "--window_step",
+        type=int,
         help="step (nt) of window for calculation of coverage (default: 100)",
     )
     p.add_argument(
         "-M",
         "--mapq_cutoff",
+        type=int,
         help="cutoff of mapping quality when calculating coverages (default: 5)",
     )
     p.add_argument(
         "-L",
         "--mapl_cutoff",
+        type=int,
         help="cutoff of mapping length when calculating coverages (default: 50)",
     )
     p.add_argument(
         "-R",
         "--max_mismatch_ratio",
+        type=float,
         help="maximum of mismatch ratio for each read as a hit (default: 0.03)",
         default=0.03,
     )
     p.add_argument(
         "-T",
         "--thread_num",
+        type=int,
         help="set number of threads for parallel running (default: 1)",
         default=1,
     )

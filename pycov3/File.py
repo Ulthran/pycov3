@@ -51,7 +51,7 @@ class FastaFile(File):
 
             for header in faiter:
                 # drop the ">"
-                header_str = header.__next__()[1:].strip()
+                header_str = header.__next__()[1:].strip().split(" ")[0]
 
                 # join all sequence lines to one.
                 seq_str = "".join(s.strip() for s in faiter.__next__())
@@ -63,7 +63,7 @@ class FastaFile(File):
 
     def generate_contigs(self):
         self.contigs = {n: Contig(n, s, **self.window_params) for n, s in self.parse()}
-        num_too_small = sum(1 for c in self.contigs.values() if c.windows)
+        num_too_small = sum(1 for c in self.contigs.values() if not c.windows)
         total_contigs = len(self.contigs)
         logging.info(f"For FASTA {self.fp}, {num_too_small} contigs of {total_contigs} are ignored for being too small")
 
@@ -80,8 +80,9 @@ class SamFile(File):
             self.sample = stem[0]
             self.bin = stem[1]
         except IndexError:
-            logging.error(f"SAM filename {self.fp} not of format {{sample}}_{{bin}}.sam")
-            raise ValueError
+            logging.debug(f"SAM filename {self.fp} not of format {{sample}}_{{bin}}.sam")
+            self.sample = fp.stem
+            self.bin = ""
 
     def parse(self) -> list:
         with open(self.fp, "r") as sam_file:
@@ -137,7 +138,7 @@ class Cov3File(File):
             logging.error(f"Max mismatch ratio of {self.max_mismatch_ratio} is not between 0.01 and 0.30")
             raise ValueError
         
-        self.min_cov_window = 0
+        self.min_cov_window = 0.1
         self.min_window_count = 5
     
     def parse(self) -> None:
@@ -146,9 +147,9 @@ class Cov3File(File):
     def write(self, sams: list, fasta: FastaFile) -> None:
         if not fasta.contigs:
             fasta.generate_contigs()
+        print(fasta.contigs)
         
         with open(self.fp, "w") as f_out:
-            contigs_ignored, total_contigs = 0, 0
             for sam in sams:
                 sam_name = sam.fp.stem
                 current_contig = ""
@@ -157,7 +158,10 @@ class Cov3File(File):
                     contig_name = line['reference_name']
                     if contig_name == "*":
                         break
-                    contig = fasta.contigs[contig_name]
+                    try:
+                        contig = fasta.contigs[contig_name]
+                    except KeyError:
+                        continue
                     contig_len = contig.seq_len
                     edge_length = contig.edge_length
                     window_size = contig.window_size
@@ -183,13 +187,13 @@ class Cov3File(File):
                                     cov_step.append(0)
 
                                 if len(cov_step) == window_size / window_step:
-                                    avg_cov_window = cov_window_sum / window_size + sys.float_info.min # Calculate avg and make sure it's non-zero
-                                    log_cov = math.log(avg_cov_window) / math.log(2)
+                                    avg_cov_window = cov_window_sum / window_size
                                     window = contig.windows[n]
                                     gc_content = window.gc_content
                                     n += 1
                                     cov_window_sum -= cov_step.pop(0)
                                     if avg_cov_window > self.min_cov_window:
+                                        log_cov = math.log(avg_cov_window) / math.log(2)
                                         qualified_info.append(f"{log_cov},{gc_content},{sam_name},{contig_name},{contig_len}")
 
                             if n >= self.min_window_count and len(qualified_info) == n:
