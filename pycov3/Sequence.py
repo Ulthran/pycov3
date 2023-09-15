@@ -1,5 +1,4 @@
 import logging
-    
 
 class Window():
     def __init__(self, start: int, end: int, sub_seq: str) -> None:
@@ -52,12 +51,17 @@ class Contig():
         self,
         name: str,
         seq: str,
+        sample: str,
+        bin: str,
         edge_length: int,
         window_size: int = 5000,
         window_step: int = 100,
     ) -> None:
         self.name = name
         self.seq_len = len(seq)
+        self.sample = sample
+        self.bin = bin
+
         self.edge_length = edge_length
         self.window_size = window_size
         self.window_step = window_step
@@ -79,7 +83,9 @@ class Contig():
         
         if self.seq_len >= self.window_size + 2 * self.edge_length:
             self.windows = [Window(s, e, seq[s:e]) for s, e in Window.generate_windows(self.seq_len, self.edge_length, self.window_size, self.window_step)]
+            logging.debug(f"Num windows: {len(self.windows)}")
+            import sys
+            #logging.debug(f"Mem of windows: {sum([sys.getsizeof(i) for i in self.windows])}")
         else:
-            logging.debug(f"Contig {self.name} is too short and will be ignored")
+            #logging.debug(f"Contig {self.name} is too short and will be ignored")
             self.windows = []
-    

@@ -66,9 +66,14 @@ class SamDir(Directory):
                     if not char.isdigit():
                         cutoff = index
                         break
-                cigar_val = int(line["cigar"][:cutoff])
-                if cigar_val > edge_length:
-                    edge_length = cigar_val
+                
+                try:
+                    cigar_val = int(line["cigar"][:cutoff])
+                    if cigar_val > edge_length:
+                        edge_length = cigar_val
+                except ValueError:
+                    logging.debug(f"Couldn't parse CIGAR value of {line['cigar']}")
+                    break
 
                 checks += 1
                 if checks > 100:
@@ -97,4 +102,4 @@ class Cov3Dir(Directory):
     
     def generate(self, sam_d: SamDir, fasta_d: FastaDir):
         for cov3 in self.files:
-            cov3.write(sam_d.files, fasta_d.get_bin(cov3.bin))
+            cov3.write(sam_d.get_bin(cov3.bin), fasta_d.get_bin(cov3.bin))

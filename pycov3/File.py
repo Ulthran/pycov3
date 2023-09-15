@@ -38,7 +38,7 @@ class FastaFile(File):
         self.contigs = {}
 
         try:
-            stem = fp.stem.split(".")
+            stem = self.fp.stem.split(".")
             self.sample = stem[0]
             self.bin = stem[1]
         except IndexError:
@@ -62,10 +62,13 @@ class FastaFile(File):
         pass
 
     def generate_contigs(self):
-        self.contigs = {n: Contig(n, s, **self.window_params) for n, s in self.parse()}
+        self.contigs = {n: Contig(n, s, self.sample, self.bin, **self.window_params) for n, s in self.parse()}
         num_too_small = sum(1 for c in self.contigs.values() if not c.windows)
         total_contigs = len(self.contigs)
         logging.info(f"For FASTA {self.fp}, {num_too_small} contigs of {total_contigs} are ignored for being too small")
+
+    def erase_contigs(self):
+        del self.contigs
 
 
 """
@@ -75,14 +78,9 @@ other tools aren't guaranteed to have the same formatting of latter columns
 class SamFile(File):
     def __init__(self, fp: Path) -> None:
         super().__init__(fp)
-        try:
-            stem = fp.stem.split("_")
-            self.sample = stem[0]
-            self.bin = stem[1]
-        except IndexError:
-            logging.debug(f"SAM filename {self.fp} not of format {{sample}}_{{bin}}.sam")
-            self.sample = fp.stem
-            self.bin = ""
+        stem = self.fp.stem.split("_")
+        self.sample = stem[0]
+        self.bin = stem[1].split(".")[0]
 
     def parse(self) -> list:
         with open(self.fp, "r") as sam_file:
@@ -97,12 +95,15 @@ class SamFile(File):
                 mapping_quality = int(fields[4])
                 cigar = fields[5]
                 mismatch = 0
-                if reference_name != "*":
-                    # Find XM field for mismatches
-                    for i in [13, 14, 15, 12, 11]:
-                        if fields[i].split(":") == "XM":
-                            mismatch = int(fields[i].split(":")[2])
-                            break
+                try:
+                    if reference_name != "*":
+                        # Find XM field for mismatches
+                        for i in [13, 14, 15, 12, 11]:
+                            if fields[i].split(":") == "XM":
+                                mismatch = int(fields[i].split(":")[2])
+                                break
+                except IndexError:
+                    pass
 
                 parsed_read = {
                     "read_name": read_name,
@@ -114,6 +115,20 @@ class SamFile(File):
                     "mismatch": mismatch
                 }
                 yield parsed_read
+
+    def parse_contig_lengths(self) -> list:
+        lengths = {}
+        with open(self.fp, "r") as sam_file:
+            for line in sam_file:
+                if line.startswith("@"):
+                    if line.startswith("@SQ"):
+                        contig_name = line.split(" ")[1][3:]
+                        contig_length = int(line.split(" ")[2][3:])
+                        lengths[contig_name] = contig_length
+                else:
+                    break
+        
+        return lengths
 
     def write(self):
         pass
@@ -145,13 +160,99 @@ class Cov3File(File):
         pass
 
     def write(self, sams: list, fasta: FastaFile) -> None:
-        if not fasta.contigs:
-            fasta.generate_contigs()
-        print(fasta.contigs)
+        sam_generators = {sam.fp.stem: sam.parse() for sam in sams}
+        next_lines = {name: next(sg, {}) for name, sg in sam_generators.items()}
+
+        with open(self.fp, "w") as f_out:
+            for contig_name, seq in fasta.parse():
+                contig = Contig(contig_name, seq, fasta.sample, fasta.bin, **fasta.window_params)
+                print(f"Current contig: {contig_name}")
+                
+                for name, line in next_lines.items():
+                    mut_line = line
+                    coverages = {}
+                    while True:
+                        if not mut_line:
+                            break # Generator is exhausted
+                        if mut_line["reference_name"] == "*":
+                            next_lines[name] = {}
+                            break # SAM file has no more mapped reads
+                        if mut_line["reference_name"] != contig_name:
+                            break # This contig is unmapped by this SAM file
+                        if contig.windows:
+                            coverages = self.__update_coverages(coverages, mut_line, contig.edge_length, contig.window_step)
+
+                        mut_line = next(sam_generators[name], {})
+
+                    next_lines[name] = mut_line # Instead of updating with every iteration of the while loop
+                    if coverages:
+                        for info in self.__write_log_cov(contig, coverages, contig.edge_length, contig.window_size, contig.window_step):
+                            f_out.write(f"{info},{name},{contig_name},{contig.seq_len}\n")
+        
+        logging.debug(f"Finished writing {self.fp}")
+                    
+    def __update_coverages(self, coverages: dict, line: dict, edge_length: int, window_step: int) -> dict:
+        mapl = self.calculate_mapl(line["cigar"])
+        if line["mapping_quality"] >= self.mapq_cutoff and mapl >= self.mapl_cutoff and line["mismatch"] <= self.max_mismatch_ratio * mapl:
+            start_step = int((line["position"] - 1 - edge_length) / window_step)
+            end_step = int((line["position"] - 1 + mapl - edge_length) / window_step)
+
+            if start_step not in coverages:
+                coverages[start_step] = 0
+            coverages[start_step] += window_step - ((line["position"] - 1 - edge_length) % window_step)
+            if end_step not in coverages:
+                coverages[end_step] = 0
+            coverages[end_step] += (line["position"] - 1 + mapl - edge_length) % window_step
+            
+            for step in range(start_step + 1, end_step):
+                if step not in coverages:
+                    coverages[step] = 0
+                coverages[step] += window_step
+        
+        return coverages
+    
+    def __write_log_cov(self, contig: Contig, coverages: dict, edge_length: int, window_size: int, window_step: int) -> list:
+        first_i = contig.windows[0].start
+        last_i = contig.windows[-1].end
+        first_step = int((first_i - 1 - edge_length) / window_step)
+        last_step = int((last_i - 1 - edge_length) / window_step)
+
+        cov_step = []
+        cov_window_sum = 0
+        qualified_info = [] # Information to output
+        n = 0 # Window index
+
+        for step in range(first_step, last_step):
+            if step in coverages.keys():
+                cov_step.append(coverages[step])
+                cov_window_sum += coverages[step]
+            else:
+                cov_step.append(0)
+
+            if len(cov_step) == window_size / window_step:
+                avg_cov_window = cov_window_sum / window_size
+                window = contig.windows[n]
+                gc_content = window.gc_content
+                n += 1
+                cov_window_sum -= cov_step.pop(0)
+                if avg_cov_window > self.min_cov_window:
+                    log_cov = round(math.log(avg_cov_window) / math.log(2), 4)
+                    qualified_info.append(f"{log_cov},{gc_content}")
+
+        if n >= self.min_window_count and len(qualified_info) == n:
+            return qualified_info
+        return []
+
+
+
+    def other_func(self):
+        #if not fasta.contigs:
+        #    fasta.generate_contigs()
         
         with open(self.fp, "w") as f_out:
             for sam in sams:
                 sam_name = sam.fp.stem
+                logging.debug(f"Current SAM: {sam_name}")
                 current_contig = ""
                 coverages = {}
                 for line in sam.parse():
@@ -162,6 +263,8 @@ class Cov3File(File):
                         contig = fasta.contigs[contig_name]
                     except KeyError:
                         continue
+                    if contig.bin != self.bin:
+                        continue
                     contig_len = contig.seq_len
                     edge_length = contig.edge_length
                     window_size = contig.window_size
@@ -169,6 +272,9 @@ class Cov3File(File):
 
                     if contig.windows: # Check that the contig is big enough to be windowed
                         if current_contig != contig_name and current_contig: # Only output to file on contig change while parsing SAM
+                            logging.debug(f"Reporting for: {contig_name}")
+                            logging.debug(f"Next up: {current_contig}")
+
                             first_i = contig.windows[0].start
                             last_i = contig.windows[-1].end
                             first_step = int((first_i - 1 - edge_length) / window_step)
@@ -193,7 +299,7 @@ class Cov3File(File):
                                     n += 1
                                     cov_window_sum -= cov_step.pop(0)
                                     if avg_cov_window > self.min_cov_window:
-                                        log_cov = math.log(avg_cov_window) / math.log(2)
+                                        log_cov = round(math.log(avg_cov_window) / math.log(2), 4)
                                         qualified_info.append(f"{log_cov},{gc_content},{sam_name},{contig_name},{contig_len}")
 
                             if n >= self.min_window_count and len(qualified_info) == n:
@@ -209,24 +315,26 @@ class Cov3File(File):
                             end_step = int((line["position"] - 1 + mapl - edge_length) / window_step)
 
                             if start_step not in coverages:
-                                coverages[start_step] = window_step - ((line["position"] - 1 - edge_length) % window_step)
-                            else:
-                                coverages[start_step] += window_step - ((line["position"] - 1 - edge_length) % window_step)
+                                coverages[start_step] = 0
+                            coverages[start_step] += window_step - ((line["position"] - 1 - edge_length) % window_step)
                             if end_step not in coverages:
-                                coverages[end_step] = (line["position"] - 1 + mapl - edge_length) % window_step
-                            else:
-                                coverages[end_step] += (line["position"] - 1 + mapl - edge_length) % window_step
+                                coverages[end_step] = 0
+                            coverages[end_step] += (line["position"] - 1 + mapl - edge_length) % window_step
                             
                             for step in range(start_step + 1, end_step):
                                 if step not in coverages:
-                                    coverages[step] = window_step
-                                else:
-                                    coverages[step] += window_step
+                                    coverages[step] = 0
+                                coverages[step] += window_step
+
+        logging.info(f"Finished writing {self.fp}")
     
     @staticmethod
     def calculate_mapl(cigar: str) -> int:
         operations = []
         current_length = ''
+
+        if cigar == "*":
+            return -1
         
         for char in cigar:
             if char.isdigit():
