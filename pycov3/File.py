@@ -158,7 +158,7 @@ class Cov3File(File):
         self.min_cov_window = 0.1
         self.min_window_count = 5
 
-    def parse(self) -> None:
+    def parse(self):
         with open(self.fp) as f:
             for line in f.readlines():
                 fields = line.split(",")
@@ -170,7 +170,7 @@ class Cov3File(File):
                     "length": int(fields[4]),
                 }
 
-    def parse_sample_contig(self) -> None:
+    def parse_sample_contig(self):
         with open(self.fp) as f:
             data_dict = {}
             for line in f.readlines():
@@ -203,8 +203,7 @@ class Cov3File(File):
             for values in data_dict.values():
                 yield values
 
-    @override
-    def write(self, sams: list, fasta: FastaFile, window_params: dict) -> None:
+    def write(self, sams: list, fasta: FastaFile, window_params: dict):
         sam_generators = {sam.fp.stem: sam.parse() for sam in sams}
         next_lines = OrderedDict(
             sorted({name: next(sg, {}) for name, sg in sam_generators.items()}.items())

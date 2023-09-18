@@ -10,7 +10,7 @@ def test_fasta_file_init():
 
     fasta_file = FastaFile(fasta_file_path)
     assert fasta_file.sample == "max_bin"
-    assert fasta_file.bin == "001"
+    assert fasta_file.bin_name == "001"
 
 
 def test_fasta_file_parse():

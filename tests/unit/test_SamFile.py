@@ -10,7 +10,7 @@ def test_sam_file_init():
 
     sam_file = SamFile(sam_file_path)
     assert sam_file.sample == "Akk"
-    assert sam_file.bin == "001"
+    assert sam_file.bin_name == "001"
 
 
 def test_sam_file_parse():

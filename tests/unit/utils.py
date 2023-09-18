@@ -10,7 +10,19 @@ def create_sample_sam_file(sam_file_path):
 
 
 def create_sample_fasta_file(fasta_file_path):
-    # Create a sample FastaFile for testing
+    # Create a sample fasta file for testing
     sample_fasta_content = ">Contig1\nATCGATCG\n>Contig2\nGCTAGCTA\n"
     with open(fasta_file_path, "w") as f:
         f.write(sample_fasta_content)
+
+
+def create_sample_cov3_file(cov3_file_path):
+    # Create a sample cov3 file for testing
+    sample_cov3_content = [
+        "1.234,0.567,sample1,contig1,100\n",
+        "1.234,0.567,sample1,contig1,100\n",
+        "2.345,0.678,sample1,contig2,150\n",
+        "3.456,0.789,sample2,contig2,150\n",
+    ]
+    with open(cov3_file_path, "w") as f:
+        f.writelines(sample_cov3_content)
