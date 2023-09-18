@@ -32,6 +32,8 @@ jobs:
         run: pytest -s -vvvv -l --tb=long tests
       - name: "Upload coverage to Codecov"
         uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         # with:
         #   fail_ci_if_error: true
 
