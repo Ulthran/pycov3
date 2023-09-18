@@ -13,8 +13,7 @@ class Directory(ABC):
         self.files = []
 
         if not fp.is_dir() and fp.exists():
-            logging.error(f"{self.fp} is not a directory")
-            raise ValueError
+            raise ValueError(f"{self.fp} is not a directory")
 
     def get_filenames(self) -> list:
         return [".".join(f.fp.name.split(".")[:-1]) for f in self.files]
@@ -30,14 +29,12 @@ class FastaDir(Directory):
             if str(x).endswith((".fasta", ".fa", ".fna"))
         ]
         if not self.files:
-            logging.error(f"No files found ending in .fasta, .fa, or .fna in {self.fp}")
-            raise ValueError
+            raise ValueError(f"No files found ending in .fasta, .fa, or .fna in {self.fp}")
 
     def get_bin(self, bin: str) -> FastaFile:
         fasta_l = [f for f in self.files if f.bin == bin]
         if len(fasta_l) != 1:
-            logging.error(f"Found 0 or more than 1 matches for bin {bin} in FASTAs")
-            raise ValueError
+            raise ValueError(f"Found 0 or more than 1 matches for bin {bin} in FASTAs")
         return fasta_l[0]
 
 
@@ -47,8 +44,7 @@ class SamDir(Directory):
 
         self.files = [SamFile(x) for x in self.fp.iterdir() if str(x).endswith(".sam")]
         if not self.files:
-            logging.error(f"No files found ending in .sam in {self.fp}")
-            raise ValueError
+            raise ValueError(f"No files found ending in .sam in {self.fp}")
 
     def calculate_edge_length(self) -> int:
         edge_length = 0
@@ -89,10 +85,9 @@ class Cov3Dir(Directory):
             logging.info(f"{self.fp} does not exist, creating it now")
             self.fp.mkdir(parents=True, exist_ok=True)
         if any(self.fp.iterdir()) and not self.overwrite:
-            logging.error(
+            raise ValueError(
                 f"{self.fp} is a non-empty directory, please either point output to an empty or non-existent directory or run with the overwrite flag"
             )
-            raise ValueError
 
         self.files = [
             Cov3File(fp / f"{fn}.cov3", fn.split(".")[-1], **coverage_params)

@@ -8,16 +8,16 @@ class Window:
         self.len = self.end - self.start
 
         if self.start < 0:
-            logging.error(f"Window start must be larger than 0 ({self.start} > 0)")
-            raise ValueError
+            raise ValueError(f"Window start must be larger than 0 ({self.start} > 0)")
         if self.len <= 0:
-            logging.error(
+            raise ValueError(
                 f"Window end must be larger than start ({self.end > self.start})"
             )
-            raise ValueError
+        if self.len != len(sub_seq):
+            raise ValueError("Derived length from start and end not equal to length of given string")
 
         self.gc_content = self.calculate_GC_content(sub_seq)
-        self.gc_skew = self.calculate_GC_skew(sub_seq)
+        #self.gc_skew = self.calculate_GC_skew(sub_seq)
 
     """
     Returns subsequence represented by window (inclusive on start and exclusive on end)
@@ -25,10 +25,9 @@ class Window:
 
     def get_window(self, seq: str):
         if self.end > len(seq):
-            logging.error(
+            raise ValueError(
                 f"Window end must be smaller than length of sequence ({self.end} < {len(seq)})"
             )
-            raise ValueError
         return seq[self.start : self.end]
 
     @staticmethod
@@ -50,7 +49,7 @@ class Window:
         return gc_content
 
     @staticmethod
-    def calculate_GC_skew(seq: str):  # CHECK THIS
+    def calculate_GC_skew(seq: str):
         gc_skew = [0]
         for i in range(1, len(seq)):
             gc_skew.append(gc_skew[i - 1] + (seq[i] == "G") - (seq[i] == "C"))
@@ -78,21 +77,17 @@ class Contig:
         self.window_step = window_step
 
         if not (10 <= self.window_step <= 1000):
-            logging.error(
+            raise ValueError(
                 f"Window step of {self.window_step} is not between 10 and 1,000"
             )
-            raise ValueError
         if not (500 <= self.window_size <= 10000):
-            logging.error(
+            raise ValueError(
                 f"Window size of {self.window_size} is not between 500 and 10,000"
             )
-            raise ValueError
         if self.window_size < self.window_step * 2:
-            logging.error(f"Window size must be at least twice the window step value")
-            raise ValueError
+            raise ValueError(f"Window size must be at least twice the window step value")
         if self.window_size % self.window_step != 0:
-            logging.error(f"Window step must evenly divide window size")
-            raise ValueError
+            raise ValueError(f"Window step must evenly divide window size")
 
         if self.seq_len >= self.window_size + 2 * self.edge_length:
             self.windows = [
@@ -102,9 +97,5 @@ class Contig:
                 )
             ]
             logging.debug(f"Num windows: {len(self.windows)}")
-            import sys
-
-            # logging.debug(f"Mem of windows: {sum([sys.getsizeof(i) for i in self.windows])}")
         else:
-            # logging.debug(f"Contig {self.name} is too short and will be ignored")
             self.windows = []
