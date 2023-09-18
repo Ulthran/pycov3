@@ -1,12 +1,6 @@
 from pathlib import Path
 from pycov3.File import FastaFile
-
-
-def create_sample_fasta_file(fasta_file_path):
-    # Create a sample FastaFile for testing
-    sample_fasta_content = ">Contig1\nATCGATCG\n>Contig2\nGCTAGCTA\n"
-    with open(fasta_file_path, "w") as f:
-        f.write(sample_fasta_content)
+from tests.unit.utils import create_sample_fasta_file
 
 
 def test_fasta_file_init():
