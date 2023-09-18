@@ -32,10 +32,8 @@ class File(ABC):
 
 
 class FastaFile(File):
-    def __init__(self, fp: Path, window_params: dict) -> None:
+    def __init__(self, fp: Path) -> None:
         super().__init__(fp)
-        self.window_params = window_params
-        self.contigs = {}
 
         try:
             stem = self.fp.stem.split(".")
@@ -207,7 +205,9 @@ class Cov3File(File):
 
     def write(self, sams: list, fasta: FastaFile) -> None:
         sam_generators = {sam.fp.stem: sam.parse() for sam in sams}
-        next_lines = OrderedDict(sorted({name: next(sg, {}) for name, sg in sam_generators.items()}.items()))
+        next_lines = OrderedDict(
+            sorted({name: next(sg, {}) for name, sg in sam_generators.items()}.items())
+        )
 
         with open(self.fp, "w") as f_out:
             for contig_name, seq in fasta.parse():
