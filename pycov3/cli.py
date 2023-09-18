@@ -111,10 +111,14 @@ def main(argv=None):
     window_params = {k: v for k, v in window_params.items() if v is not None}
     coverage_params = {k: v for k, v in coverage_params.items() if v is not None}
 
-    fasta_d = FastaDir(Path(args.fasta_dir), args.overwrite, window_params)
+    fasta_d = FastaDir(Path(args.fasta_dir), args.overwrite)
 
     cov3_d = Cov3Dir(
-        Path(args.out_dir), args.overwrite, fasta_d.get_filenames(), coverage_params
+        Path(args.out_dir),
+        args.overwrite,
+        fasta_d.get_filenames(),
+        window_params,
+        coverage_params,
     )
 
     cov3_d.generate(sam_d, fasta_d)

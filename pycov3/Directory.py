@@ -20,11 +20,11 @@ class Directory(ABC):
 
 
 class FastaDir(Directory):
-    def __init__(self, fp: Path, overwrite: bool, window_params: dict) -> None:
+    def __init__(self, fp: Path, overwrite: bool) -> None:
         super().__init__(fp, overwrite)
 
         self.files = [
-            FastaFile(x, window_params)
+            FastaFile(x)
             for x in self.fp.iterdir()
             if str(x).endswith((".fasta", ".fa", ".fna"))
         ]
@@ -79,9 +79,15 @@ class SamDir(Directory):
 
 class Cov3Dir(Directory):
     def __init__(
-        self, fp: Path, overwrite: bool, fns: list, coverage_params: dict
+        self,
+        fp: Path,
+        overwrite: bool,
+        fns: list,
+        window_params: dict,
+        coverage_params: dict,
     ) -> None:
         super().__init__(fp, overwrite)
+        self.window_params = window_params
 
         if not fp.exists():
             logging.info(f"{self.fp} does not exist, creating it now")
@@ -98,7 +104,9 @@ class Cov3Dir(Directory):
 
     def generate(self, sam_d: SamDir, fasta_d: FastaDir):
         for cov3 in self.files:
-            cov3.write(sam_d.get_bin(cov3.bin), fasta_d.get_bin(cov3.bin))
+            cov3.write(
+                sam_d.get_bin(cov3.bin), fasta_d.get_bin(cov3.bin), self.window_params
+            )
 
     def get_bin(self, bin: str) -> Cov3File:
         result = [c for c in self.files if c.bin == bin]

@@ -203,7 +203,7 @@ class Cov3File(File):
             for values in data_dict.values():
                 yield values
 
-    def write(self, sams: list, fasta: FastaFile) -> None:
+    def write(self, sams: list, fasta: FastaFile, window_params: dict) -> None:
         sam_generators = {sam.fp.stem: sam.parse() for sam in sams}
         next_lines = OrderedDict(
             sorted({name: next(sg, {}) for name, sg in sam_generators.items()}.items())
@@ -212,7 +212,7 @@ class Cov3File(File):
         with open(self.fp, "w") as f_out:
             for contig_name, seq in fasta.parse():
                 contig = Contig(
-                    contig_name, seq, fasta.sample, fasta.bin, **fasta.window_params
+                    contig_name, seq, fasta.sample, fasta.bin, **window_params
                 )
                 logging.debug(f"Current contig: {contig_name}")
 

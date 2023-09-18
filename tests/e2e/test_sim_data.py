@@ -30,9 +30,11 @@ def test_sim_data():
     window_params = {k: v for k, v in window_params.items() if v is not None}
     coverage_params = {k: v for k, v in coverage_params.items() if v is not None}
 
-    fasta_d = FastaDir(fastas_fp, overwrite, window_params)
+    fasta_d = FastaDir(fastas_fp, overwrite)
 
-    cov3_d = Cov3Dir(output_fp, overwrite, fasta_d.get_filenames(), coverage_params)
+    cov3_d = Cov3Dir(
+        output_fp, overwrite, fasta_d.get_filenames(), window_params, coverage_params
+    )
 
     cov3_d.generate(sam_d, fasta_d)
 
@@ -53,19 +55,18 @@ def test_sim_data():
 
 
 def akk_001_k141_0_test(lc):
-    assert sum(lc[: int(len(lc) / 2)]) < sum(lc[int(len(lc) / 2) :]), "akk_001_k141_0"
+    assert sum(lc[: int(len(lc) / 2)]) < sum(lc[int(len(lc) / 2) :])
 
 
 def bfrag_001_k141_0_test(lc):
-    assert sum(lc[: int(len(lc) / 2)]) > sum(lc[int(len(lc) / 2) :]), "bfrag_001_k141_0"
+    assert sum(lc[: int(len(lc) / 2)]) > sum(lc[int(len(lc) / 2) :])
 
 
 def akk_001_k141_2_test(lc):
     assert (
-        round(lc[0], 1) == round(lc[int(len(lc) / 2)], 1) == round(lc[len(lc) - 1], 1),
-        "akk_001_k141_2",
+        round(lc[0], 1) == round(lc[int(len(lc) / 2)], 1) == round(lc[len(lc) - 1], 1)
     )
 
 
 def bfrag_001_k141_2_test(lc):
-    assert sum(lc[: int(len(lc) / 2)]) < sum(lc[int(len(lc) / 2) :]), "bfrag_001_k141_2"
+    assert sum(lc[: int(len(lc) / 2)]) < sum(lc[int(len(lc) / 2) :])
