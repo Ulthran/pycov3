@@ -1,7 +1,7 @@
 import logging
 import math
-import sys
 from abc import ABC, abstractmethod
+from collections import OrderedDict
 from itertools import groupby
 from pathlib import Path
 
@@ -61,20 +61,6 @@ class FastaFile(File):
 
     def write(self):
         pass
-
-    def generate_contigs(self):
-        self.contigs = {
-            n: Contig(n, s, self.sample, self.bin, **self.window_params)
-            for n, s in self.parse()
-        }
-        num_too_small = sum(1 for c in self.contigs.values() if not c.windows)
-        total_contigs = len(self.contigs)
-        logging.info(
-            f"For FASTA {self.fp}, {num_too_small} contigs of {total_contigs} are ignored for being too small"
-        )
-
-    def erase_contigs(self):
-        del self.contigs
 
 
 """
@@ -221,7 +207,7 @@ class Cov3File(File):
 
     def write(self, sams: list, fasta: FastaFile) -> None:
         sam_generators = {sam.fp.stem: sam.parse() for sam in sams}
-        next_lines = {name: next(sg, {}) for name, sg in sam_generators.items()}
+        next_lines = OrderedDict(sorted({name: next(sg, {}) for name, sg in sam_generators.items()}.items()))
 
         with open(self.fp, "w") as f_out:
             for contig_name, seq in fasta.parse():
