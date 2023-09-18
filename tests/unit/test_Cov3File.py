@@ -1,5 +1,6 @@
 from pathlib import Path
-from pycov3.File import Cov3File, SamFile
+from pycov3.File import Cov3File, SamFile, FastaFile
+from pycov3.Sequence import Contig
 from tests.unit.utils import (
     create_sample_cov3_file,
     create_sample_fasta_file,
@@ -51,16 +52,78 @@ def test_cov3_file_update_coverages():
 
     cov3_fp = Path("max_bin.001.cov3")
     create_sample_cov3_file(cov3_fp)
-    cov3_file = Cov3File(cov3_fp, "001")
+    cov3_file = Cov3File(cov3_fp, "001", mapq_cutoff=1, mapl_cutoff=30)
 
     sam_lines = list(sam_file.parse())
     coverages = {}
 
     for line in sam_lines:
         coverages = cov3_file._Cov3File__update_coverages(coverages, line, 2, 2)
-        print(coverages)
 
-    assert coverages == {1: 1}
+    assert coverages == {
+        -1: 2,
+        14: 2,
+        0: 2,
+        1: 2,
+        2: 2,
+        3: 2,
+        4: 4,
+        5: 4,
+        6: 4,
+        7: 4,
+        8: 4,
+        9: 4,
+        10: 4,
+        11: 4,
+        12: 4,
+        13: 4,
+        19: 0,
+        15: 2,
+        16: 2,
+        17: 2,
+        18: 2,
+    }
+
+
+def test_cov3_file_log_cov_info():
+    # Test cov3 file update_coverages utility
+    fasta_file_path = Path("max_bin.001.fa")
+    create_sample_fasta_file(fasta_file_path)
+    fasta_file = FastaFile(fasta_file_path)
+    fasta_records = list(fasta_file.parse())
+
+    cov3_fp = Path("max_bin.001.cov3")
+    create_sample_cov3_file(cov3_fp)
+    cov3_file = Cov3File(cov3_fp, "001", mapq_cutoff=1, mapl_cutoff=30)
+
+    contig = Contig(
+        fasta_records[0][0], fasta_records[0][1] * 10, "Akk0", "001", 5, 500, 10
+    )
+    coverages = {}
+    for i in range(-1, 599):
+        coverages[i] = 2
+    coverages[599] = 0
+
+    info = cov3_file._Cov3File__log_cov_info(contig, coverages, 5, 500, 10)
+    assert info == [
+        "-2.3219,0.496",
+        "-2.3219,0.496",
+        "-2.3219,0.5",
+        "-2.3219,0.504",
+        "-2.3219,0.504",
+        "-2.3219,0.502",
+        "-2.3219,0.498",
+        "-2.3219,0.496",
+        "-2.3219,0.496",
+        "-2.3219,0.5",
+        "-2.3219,0.504",
+        "-2.3219,0.504",
+        "-2.3219,0.502",
+        "-2.3219,0.498",
+        "-2.3219,0.496",
+        "-2.3219,0.498",
+        "-2.3219,0.502",
+    ]
 
 
 def test_cov3_file_calculate_mapl():

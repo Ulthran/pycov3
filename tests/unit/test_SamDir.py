@@ -53,4 +53,4 @@ def test_sam_dir_calculate_edge_length():
 
     window_edge_length = sam_dir.calculate_edge_length()
 
-    assert window_edge_length == 10
+    assert window_edge_length == 30

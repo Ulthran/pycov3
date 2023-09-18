@@ -27,7 +27,7 @@ def test_sam_file_parse():
     assert parsed_reads[0]["reference_name"] == "Contig1"
     assert parsed_reads[0]["position"] == 1
     assert parsed_reads[0]["mapping_quality"] == 30
-    assert parsed_reads[0]["cigar"] == "10M"
+    assert parsed_reads[0]["cigar"] == "30M"
     assert parsed_reads[0]["mismatch"] == 0
 
 
