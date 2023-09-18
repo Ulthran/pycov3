@@ -11,7 +11,6 @@ def test_sim_data():
     sams_fp = sim_fp / "sams"
     fastas_fp = sim_fp / "fastas"
     output_fp = sim_fp / "output"
-    expected_output_fp = sim_fp / "expected_output"
 
     overwrite = True
 
@@ -38,12 +37,11 @@ def test_sim_data():
 
     cov3_d.generate(sam_d, fasta_d)
 
-    import shutil
-
+    # import shutil
     # shutil.copyfile(output_fp / "max_bin.002.cov3", "/mnt/d/Penn/pycov3/tests/data/sim/expected_output/max_bin.002.cov3")
 
     cov3_1 = cov3_d.get_bin("001")
-    cov3_2 = cov3_d.get_bin("002")
+    # cov3_2 = cov3_d.get_bin("002")
 
     sample_contigs_1 = list(cov3_1.parse_sample_contig())
     print(sample_contigs_1[0]["sample"])

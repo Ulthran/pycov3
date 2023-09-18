@@ -202,7 +202,7 @@ class Cov3File(File):
 
             for values in data_dict.values():
                 yield values
-    
+
     def write(self, cov3_vals: list):
         with open(self.fp, "w") as f:
             f.writelines(cov3_vals)

@@ -87,9 +87,7 @@ class Contig:
                 f"Window size of {self.window_size} is not between 500 and 10,000"
             )
         if self.window_size < self.window_step * 2:
-            raise ValueError(
-                "Window size must be at least twice the window step value"
-            )
+            raise ValueError("Window size must be at least twice the window step value")
         if self.window_size % self.window_step != 0:
             raise ValueError("Window step must evenly divide window size")
 

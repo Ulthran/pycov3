@@ -36,7 +36,9 @@ class FastaDir(Directory):
     def get_bin(self, bin_name: str) -> FastaFile:
         fasta_l = [f for f in self.files if f.bin_name == bin_name]
         if len(fasta_l) != 1:
-            raise ValueError(f"Found 0 or more than 1 matches for bin {bin_name} in FASTAs")
+            raise ValueError(
+                f"Found 0 or more than 1 matches for bin {bin_name} in FASTAs"
+            )
         return fasta_l[0]
 
 
@@ -105,7 +107,9 @@ class Cov3Dir(Directory):
     def generate(self, sam_d: SamDir, fasta_d: FastaDir):
         for cov3 in self.files:
             cov3.write(
-                sam_d.get_bin(cov3.bin_name), fasta_d.get_bin(cov3.bin_name), self.window_params
+                sam_d.get_bin(cov3.bin_name),
+                fasta_d.get_bin(cov3.bin_name),
+                self.window_params,
             )
 
     def get_bin(self, bin_name: str) -> Cov3File:
