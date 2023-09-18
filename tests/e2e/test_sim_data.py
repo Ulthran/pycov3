@@ -44,6 +44,8 @@ def test_sim_data():
     cov3_2 = cov3_d.get_bin("002")
 
     sample_contigs_1 = list(cov3_1.parse_sample_contig())
+    print(sample_contigs_1[0]["sample"])
+    print(sample_contigs_1[0]["contig"])
     akk_001_k141_0_test(sample_contigs_1[0]["log_covs"])
     bfrag_001_k141_0_test(sample_contigs_1[1]["log_covs"])
     akk_001_k141_2_test(sample_contigs_1[2]["log_covs"])
