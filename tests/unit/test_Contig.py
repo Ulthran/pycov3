@@ -8,7 +8,7 @@ def test_valid_initialization():
     assert contig.name == "Name"
     assert contig.seq_len == 4
     assert contig.sample == "Sample"
-    assert contig.bin == "001"
+    assert contig.bin_name == "001"
     assert contig.edge_length == 10
     assert contig.window_size == 5000
     assert contig.window_step == 100
