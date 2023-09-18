@@ -88,10 +88,10 @@ class Contig:
             )
         if self.window_size < self.window_step * 2:
             raise ValueError(
-                f"Window size must be at least twice the window step value"
+                "Window size must be at least twice the window step value"
             )
         if self.window_size % self.window_step != 0:
-            raise ValueError(f"Window step must evenly divide window size")
+            raise ValueError("Window step must evenly divide window size")
 
         if self.seq_len >= self.window_size + 2 * self.edge_length:
             self.windows = [

@@ -38,10 +38,10 @@ class FastaFile(File):
         try:
             stem = self.fp.stem.split(".")
             self.sample = stem[0]
-            self.bin = stem[1]
+            self.bin_name = stem[1]
         except IndexError:
             raise ValueError(
-                f"FASTA filename {self.fp} not of format {{sample}}.{{bin}}.fasta/.fa/.fna"
+                f"FASTA filename {self.fp} not of format {{sample}}.{{bin_name}}.fasta/.fa/.fna"
             )
 
     def parse(self) -> list:
@@ -72,7 +72,7 @@ class SamFile(File):
         super().__init__(fp)
         stem = self.fp.stem.split("_")
         self.sample = stem[0]
-        self.bin = stem[1].split(".")[0]
+        self.bin_name = stem[1].split(".")[0]
 
     def parse(self) -> list:
         with open(self.fp, "r") as f:
@@ -130,13 +130,13 @@ class Cov3File(File):
     def __init__(
         self,
         fp: Path,
-        bin: str,
+        bin_name: str,
         mapq_cutoff: int = 5,
         mapl_cutoff: int = 50,
         max_mismatch_ratio: float = 0.03,
     ) -> None:
         super().__init__(fp)
-        self.bin = bin
+        self.bin_name = bin_name
 
         self.mapq_cutoff = mapq_cutoff
         self.mapl_cutoff = mapl_cutoff
@@ -202,6 +202,10 @@ class Cov3File(File):
 
             for values in data_dict.values():
                 yield values
+    
+    def write(self, cov3_vals: list):
+        with open(self.fp, "w") as f:
+            f.writelines(cov3_vals)
 
     def write(self, sams: list, fasta: FastaFile, window_params: dict) -> None:
         sam_generators = {sam.fp.stem: sam.parse() for sam in sams}
@@ -212,7 +216,7 @@ class Cov3File(File):
         with open(self.fp, "w") as f_out:
             for contig_name, seq in fasta.parse():
                 contig = Contig(
-                    contig_name, seq, fasta.sample, fasta.bin, **window_params
+                    contig_name, seq, fasta.sample, fasta.bin_name, **window_params
                 )
                 logging.debug(f"Current contig: {contig_name}")
 

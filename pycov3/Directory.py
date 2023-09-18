@@ -33,10 +33,10 @@ class FastaDir(Directory):
                 f"No files found ending in .fasta, .fa, or .fna in {self.fp}"
             )
 
-    def get_bin(self, bin: str) -> FastaFile:
-        fasta_l = [f for f in self.files if f.bin == bin]
+    def get_bin(self, bin_name: str) -> FastaFile:
+        fasta_l = [f for f in self.files if f.bin_name == bin_name]
         if len(fasta_l) != 1:
-            raise ValueError(f"Found 0 or more than 1 matches for bin {bin} in FASTAs")
+            raise ValueError(f"Found 0 or more than 1 matches for bin {bin_name} in FASTAs")
         return fasta_l[0]
 
 
@@ -73,8 +73,8 @@ class SamDir(Directory):
 
         return edge_length
 
-    def get_bin(self, bin: str) -> list:
-        return [s for s in self.files if s.bin == bin]
+    def get_bin(self, bin_name: str) -> list:
+        return [s for s in self.files if s.bin_name == bin_name]
 
 
 class Cov3Dir(Directory):
@@ -105,10 +105,10 @@ class Cov3Dir(Directory):
     def generate(self, sam_d: SamDir, fasta_d: FastaDir):
         for cov3 in self.files:
             cov3.write(
-                sam_d.get_bin(cov3.bin), fasta_d.get_bin(cov3.bin), self.window_params
+                sam_d.get_bin(cov3.bin_name), fasta_d.get_bin(cov3.bin_name), self.window_params
             )
 
-    def get_bin(self, bin: str) -> Cov3File:
-        result = [c for c in self.files if c.bin == bin]
+    def get_bin(self, bin_name: str) -> Cov3File:
+        result = [c for c in self.files if c.bin_name == bin_name]
         assert len(result) == 1
         return result[0]
