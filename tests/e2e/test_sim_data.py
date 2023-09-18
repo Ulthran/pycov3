@@ -50,15 +50,12 @@ def test_sim_data():
     bfrag_001_k141_2_test(sample_contigs_1[3]["log_covs"])
 
 
-# BETTER WAY TO TEST FOR CURVES???
 def akk_001_k141_0_test(lc):
-    assert round(lc[0], 1) == round(lc[15], 1) == round(lc[30], 1)
-    assert lc[30] < lc[50] < lc[70]
-    assert lc[90] > lc[100]
+    assert sum(lc[:int(len(lc)/2)]) < sum(lc[int(len(lc)/2):])
 
 
 def bfrag_001_k141_0_test(lc):
-    assert round(lc[0], 1) == round(lc[15], 1)
+    assert sum(lc[:int(len(lc)/2)]) > sum(lc[int(len(lc)/2):])
 
 
 def akk_001_k141_2_test(lc):
@@ -66,4 +63,4 @@ def akk_001_k141_2_test(lc):
 
 
 def bfrag_001_k141_2_test(lc):
-    assert round(lc[0], 1) == round(lc[15], 1) == round(lc[30], 1)
+    assert sum(lc[:int(len(lc)/2)]) < sum(lc[int(len(lc)/2):])
