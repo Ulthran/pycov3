@@ -159,9 +159,13 @@ class Cov3File(File):
         self.max_mismatch_ratio = max_mismatch_ratio
 
         if not (0 <= self.mapq_cutoff <= 30):
-            raise ValueError(f"MapQ cutoff of {self.mapq_cutoff} is not between 0 and 30")
+            raise ValueError(
+                f"MapQ cutoff of {self.mapq_cutoff} is not between 0 and 30"
+            )
         if not (30 <= self.mapl_cutoff <= 80):
-            raise ValueError(f"MapL cutoff of {self.mapl_cutoff} is not between 30 and 80")
+            raise ValueError(
+                f"MapL cutoff of {self.mapl_cutoff} is not between 30 and 80"
+            )
         if not (0.01 <= self.max_mismatch_ratio <= 0.3):
             raise ValueError(
                 f"Max mismatch ratio of {self.max_mismatch_ratio} is not between 0.01 and 0.30"

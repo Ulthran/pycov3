@@ -14,10 +14,12 @@ class Window:
                 f"Window end must be larger than start ({self.end > self.start})"
             )
         if self.len != len(sub_seq):
-            raise ValueError("Derived length from start and end not equal to length of given string")
+            raise ValueError(
+                "Derived length from start and end not equal to length of given string"
+            )
 
         self.gc_content = self.calculate_GC_content(sub_seq)
-        #self.gc_skew = self.calculate_GC_skew(sub_seq)
+        # self.gc_skew = self.calculate_GC_skew(sub_seq)
 
     """
     Returns subsequence represented by window (inclusive on start and exclusive on end)
@@ -85,7 +87,9 @@ class Contig:
                 f"Window size of {self.window_size} is not between 500 and 10,000"
             )
         if self.window_size < self.window_step * 2:
-            raise ValueError(f"Window size must be at least twice the window step value")
+            raise ValueError(
+                f"Window size must be at least twice the window step value"
+            )
         if self.window_size % self.window_step != 0:
             raise ValueError(f"Window step must evenly divide window size")
 

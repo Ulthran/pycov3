@@ -51,16 +51,19 @@ def test_sim_data():
 
 
 def akk_001_k141_0_test(lc):
-    assert sum(lc[:int(len(lc)/2)]) < sum(lc[int(len(lc)/2):])
+    assert sum(lc[: int(len(lc) / 2)]) < sum(lc[int(len(lc) / 2) :]), "akk_001_k141_0"
 
 
 def bfrag_001_k141_0_test(lc):
-    assert sum(lc[:int(len(lc)/2)]) > sum(lc[int(len(lc)/2):])
+    assert sum(lc[: int(len(lc) / 2)]) > sum(lc[int(len(lc) / 2) :]), "bfrag_001_k141_0"
 
 
 def akk_001_k141_2_test(lc):
-    assert round(lc[0], 1) == round(lc[int(len(lc)/2)], 1) == round(lc[len(lc)-1], 1)
+    assert (
+        round(lc[0], 1) == round(lc[int(len(lc) / 2)], 1) == round(lc[len(lc) - 1], 1),
+        "akk_001_k141_2",
+    )
 
 
 def bfrag_001_k141_2_test(lc):
-    assert sum(lc[:int(len(lc)/2)]) < sum(lc[int(len(lc)/2):])
+    assert sum(lc[: int(len(lc) / 2)]) < sum(lc[int(len(lc) / 2) :]), "bfrag_001_k141_2"

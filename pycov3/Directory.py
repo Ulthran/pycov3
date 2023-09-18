@@ -29,7 +29,9 @@ class FastaDir(Directory):
             if str(x).endswith((".fasta", ".fa", ".fna"))
         ]
         if not self.files:
-            raise ValueError(f"No files found ending in .fasta, .fa, or .fna in {self.fp}")
+            raise ValueError(
+                f"No files found ending in .fasta, .fa, or .fna in {self.fp}"
+            )
 
     def get_bin(self, bin: str) -> FastaFile:
         fasta_l = [f for f in self.files if f.bin == bin]
