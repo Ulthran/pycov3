@@ -10,6 +10,7 @@ dummy_fasta_files = [
     "max_bin.004.fasta",
 ]
 
+
 def test_fasta_dir_init():
     # Define a temporary directory path for testing
     temp_dir = Path("fasta_dir")
@@ -23,6 +24,7 @@ def test_fasta_dir_init():
 
     # Test if the FastaDir object is created correctly
     assert len(fasta_dir.files) == 4  # Assuming 4 dummy files were created
+
 
 def test_fasta_dir_get_bin():
     # Define a temporary directory path for testing

@@ -59,7 +59,7 @@ def test_cov3_file_update_coverages():
     for line in sam_lines:
         coverages = cov3_file._Cov3File__update_coverages(coverages, line, 2, 2)
         print(coverages)
-    
+
     assert coverages == {1: 1}
 
 

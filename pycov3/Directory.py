@@ -114,5 +114,5 @@ class Cov3Dir(Directory):
 
     def get_bin(self, bin_name: str) -> Cov3File:
         result = [c for c in self.files if c.bin_name == bin_name]
-        assert len(result) == 1
+        assert len(result) == 1, "There should be exactly one cov3 file for each bin"
         return result[0]

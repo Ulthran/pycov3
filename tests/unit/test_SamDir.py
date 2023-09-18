@@ -10,6 +10,7 @@ dummy_sam_files = [
     "sample1_002.sam",
 ]
 
+
 def test_sam_dir_init():
     # Define a temporary directory path for testing
     temp_dir = Path("sam_dir")
@@ -18,11 +19,10 @@ def test_sam_dir_init():
     for dummy_file in dummy_sam_files:
         create_sample_sam_file(temp_dir / dummy_file)
 
-    # Initialize a FastaDir instance
     sam_dir = SamDir(temp_dir, False)
 
-    # Test if the FastaDir object is created correctly
     assert len(sam_dir.files) == 4  # Assuming 4 dummy files were created
+
 
 def test_sam_dir_get_bin():
     # Define a temporary directory path for testing
@@ -32,7 +32,6 @@ def test_sam_dir_get_bin():
     for dummy_file in dummy_sam_files:
         create_sample_sam_file(temp_dir / dummy_file)
 
-    # Initialize a FastaDir instance
     sam_dir = SamDir(temp_dir, False)
 
     # Test the get_bin method
@@ -40,3 +39,18 @@ def test_sam_dir_get_bin():
 
     assert len(sam_files) == 2
     assert sam_files[0].bin_name == "001"
+
+
+def test_sam_dir_calculate_edge_length():
+    # Define a temporary directory path for testing
+    temp_dir = Path("sam_dir")
+    os.makedirs(temp_dir)
+
+    for dummy_file in dummy_sam_files:
+        create_sample_sam_file(temp_dir / dummy_file)
+
+    sam_dir = SamDir(temp_dir, False)
+
+    window_edge_length = sam_dir.calculate_edge_length()
+
+    assert window_edge_length == 10
