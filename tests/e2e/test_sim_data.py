@@ -59,7 +59,7 @@ def bfrag_001_k141_0_test(lc):
 
 
 def akk_001_k141_2_test(lc):
-    assert round(lc[0], 1) == round(lc[30], 1) == round(lc[60], 1)
+    assert round(lc[0], 1) == round(lc[int(len(lc)/2)], 1) == round(lc[len(lc)-1], 1)
 
 
 def bfrag_001_k141_2_test(lc):
