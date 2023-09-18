@@ -1,5 +1,5 @@
 from pathlib import Path
-from pycov3.File import Cov3File
+from pycov3.File import Cov3File, SamFile
 from tests.unit.utils import (
     create_sample_cov3_file,
     create_sample_fasta_file,
@@ -45,9 +45,22 @@ def test_cov3_file_parse_sample_contig():
 
 def test_cov3_file_update_coverages():
     # Test cov3 file update_coverages utility
+    sam_file_path = Path("Akk_001.sam")
+    create_sample_sam_file(sam_file_path)
+    sam_file = SamFile(sam_file_path)
+
     cov3_fp = Path("max_bin.001.cov3")
     create_sample_cov3_file(cov3_fp)
     cov3_file = Cov3File(cov3_fp, "001")
+
+    sam_lines = list(sam_file.parse())
+    coverages = {}
+
+    for line in sam_lines:
+        coverages = cov3_file._Cov3File__update_coverages(coverages, line, 2, 2)
+        print(coverages)
+    
+    assert coverages == {1: 1}
 
 
 def test_cov3_file_calculate_mapl():
