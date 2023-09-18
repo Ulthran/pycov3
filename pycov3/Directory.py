@@ -103,3 +103,8 @@ class Cov3Dir(Directory):
     def generate(self, sam_d: SamDir, fasta_d: FastaDir):
         for cov3 in self.files:
             cov3.write(sam_d.get_bin(cov3.bin), fasta_d.get_bin(cov3.bin))
+
+    def get_bin(self, bin: str) -> Cov3File:
+        result = [c for c in self.files if c.bin == bin]
+        assert len(result) == 1
+        return result[0]

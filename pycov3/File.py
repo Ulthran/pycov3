@@ -83,8 +83,8 @@ class SamFile(File):
         self.bin = stem[1].split(".")[0]
 
     def parse(self) -> list:
-        with open(self.fp, "r") as sam_file:
-            for line in sam_file:
+        with open(self.fp, "r") as f:
+            for line in f:
                 if line.startswith("@"):
                     continue  # Skip header lines
                 fields = line.split("\t")
@@ -157,7 +157,53 @@ class Cov3File(File):
         self.min_window_count = 5
     
     def parse(self) -> None:
-        pass
+        with open(self.fp) as f:
+            for line in f.readlines():
+                fields = line.split(",")
+                yield {
+                    "log_cov": float(fields[0]),
+                    "GC_content": float(fields[1]),
+                    "sample": fields[2],
+                    "contig": fields[3],
+                    "length": int(fields[4])
+                }
+    
+    def parse_sample_contig(self) -> None:
+        with open(self.fp) as f:
+            sample = ""
+            contig = ""
+            contig_length = 0
+            log_covs = []
+            GC_contents = []
+            first = True
+            for line in f.readlines():
+                fields = line.split(",")
+                parsed_line = {
+                    "log_cov": float(fields[0]),
+                    "GC_content": float(fields[1]),
+                    "sample": fields[2],
+                    "contig": fields[3],
+                    "length": int(fields[4])
+                }
+
+                if parsed_line["sample"] == sample and parsed_line["contig"] == contig:
+                    log_covs.append(parsed_line["log_cov"])
+                    GC_contents.append(parsed_line["GC_content"])
+                else:
+                    if first:
+                        first = False
+                    else:
+                        yield {
+                            "sample": sample,
+                            "contig": contig,
+                            "contig_length": contig_length,
+                            "log_covs": log_covs,
+                            "GC_contents": GC_contents
+                        }
+                        
+                    sample = parsed_line["sample"]
+                    contig = parsed_line["contig"]
+                    contig_length = parsed_line["length"]
 
     def write(self, sams: list, fasta: FastaFile) -> None:
         sam_generators = {sam.fp.stem: sam.parse() for sam in sams}
@@ -166,7 +212,7 @@ class Cov3File(File):
         with open(self.fp, "w") as f_out:
             for contig_name, seq in fasta.parse():
                 contig = Contig(contig_name, seq, fasta.sample, fasta.bin, **fasta.window_params)
-                print(f"Current contig: {contig_name}")
+                logging.debug(f"Current contig: {contig_name}")
                 
                 for name, line in next_lines.items():
                     mut_line = line
@@ -186,7 +232,7 @@ class Cov3File(File):
 
                     next_lines[name] = mut_line # Instead of updating with every iteration of the while loop
                     if coverages:
-                        for info in self.__write_log_cov(contig, coverages, contig.edge_length, contig.window_size, contig.window_step):
+                        for info in self.__log_cov_info(contig, coverages, contig.edge_length, contig.window_size, contig.window_step):
                             f_out.write(f"{info},{name},{contig_name},{contig.seq_len}\n")
         
         logging.debug(f"Finished writing {self.fp}")
@@ -211,7 +257,7 @@ class Cov3File(File):
         
         return coverages
     
-    def __write_log_cov(self, contig: Contig, coverages: dict, edge_length: int, window_size: int, window_step: int) -> list:
+    def __log_cov_info(self, contig: Contig, coverages: dict, edge_length: int, window_size: int, window_step: int) -> list:
         first_i = contig.windows[0].start
         last_i = contig.windows[-1].end
         first_step = int((first_i - 1 - edge_length) / window_step)

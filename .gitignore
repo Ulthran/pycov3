@@ -1,3 +1,7 @@
+# Custom
+tests/data/multi-genome/
+tests/data/sim/output/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
