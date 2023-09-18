@@ -203,10 +203,7 @@ class Cov3File(File):
             for values in data_dict.values():
                 yield values
 
-    def write(self, cov3_vals: list):
-        with open(self.fp, "w") as f:
-            f.writelines(cov3_vals)
-
+    @override
     def write(self, sams: list, fasta: FastaFile, window_params: dict) -> None:
         sam_generators = {sam.fp.stem: sam.parse() for sam in sams}
         next_lines = OrderedDict(
