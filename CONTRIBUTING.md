@@ -7,10 +7,10 @@ pycov3 welcomes contributions from the community.
 This instructions are for linux base systems. (Linux, MacOS, BSD, etc.)
 ## Setting up your own fork of this repo.
 
--  On github interface click on `Fork` button.
--  Clone your fork of this repo. `git clone git@github.com:YOUR_GIT_USERNAME/pycov3.git`
--  Enter the directory `cd pycov3`
--  Add upstream repo `git remote add upstream https://github.com/Ulthran/pycov3`
+-   On github interface click on `Fork` button.
+-   Clone your fork of this repo. `git clone git@github.com:YOUR_GIT_USERNAME/pycov3.git`
+-   Enter the directory `cd pycov3`
+-   Add upstream repo `git remote add upstream https://github.com/Ulthran/pycov3`
 
 ## Setting up your own virtual environment
 
@@ -94,8 +94,8 @@ this token can be generated on [pypi.org](https://pypi.org/account/).
 To trigger a new release all you need to do is.
 
 1.  If you have changes to add to the repo
-    *  Make your changes following the steps described above.
-    *  Commit your changes following the [conventional git commit messages](https://www.conventionalcommits.org/en/v1.0.0/).
+    *   Make your changes following the steps described above.
+    *   Commit your changes following the [conventional git commit messages](https://www.conventionalcommits.org/en/v1.0.0/).
 2.  Run the tests to ensure everything is working.
 4.  Run `make release` to create a new tag and push it to the remote repo.
 

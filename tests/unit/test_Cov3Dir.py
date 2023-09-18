@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 from pycov3.Directory import Cov3Dir
-from tests.unit.utils import create_sample_sam_file
 
 window_params = {
     "window_size": 500,

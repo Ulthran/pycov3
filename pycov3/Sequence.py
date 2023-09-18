@@ -21,10 +21,6 @@ class Window:
         self.gc_content = self.calculate_GC_content(sub_seq)
         # self.gc_skew = self.calculate_GC_skew(sub_seq)
 
-    """
-    Returns subsequence represented by window (inclusive on start and exclusive on end)
-    """
-
     def get_window(self, seq: str):
         if self.end > len(seq):
             raise ValueError(
@@ -64,7 +60,7 @@ class Contig:
         name: str,
         seq: str,
         sample: str,
-        bin: str,
+        bin_name: str,
         edge_length: int,
         window_size: int = 5000,
         window_step: int = 100,
@@ -72,7 +68,7 @@ class Contig:
         self.name = name
         self.seq_len = len(seq)
         self.sample = sample
-        self.bin = bin
+        self.bin_name = bin_name
 
         self.edge_length = edge_length
         self.window_size = window_size

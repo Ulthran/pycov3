@@ -15,18 +15,43 @@ pip install pycov3
 
 ## Usage
 
-```py
-from pycov3 import BaseClass
-from pycov3 import base_function
+Create a SAM directory and FASTA directory, set any non-default window or coverage parameters, then create a COV3 directory and use it to generate a COV3 file for each contig set in the FASTA directory.
 
-BaseClass().base_method()
-base_function()
+```py
+    from pycov3.Directory import Cov3Dir, FastaDir, SamDir
+
+    sam_d = SamDir(Path("/path/to/sams/"), False)
+
+    window_params = {
+        "window_size": None,
+        "window_step": None,
+        "edge_length": sam_d.calculate_edge_length(),
+    }
+    coverage_params = {
+        "mapq_cutoff": None,
+        "mapl_cutoff": None,
+        "max_mismatch_ratio": None,
+    }
+    window_params = {k: v for k, v in window_params.items() if v is not None}
+    coverage_params = {k: v for k, v in coverage_params.items() if v is not None}
+
+    fasta_d = FastaDir(Path("/path/to/fastas/"), False)
+
+    cov3_d = Cov3Dir(
+        Path(args.out_dir),
+        False,
+        fasta_d.get_filenames(),
+        window_params,
+        coverage_params,
+    )
+
+    cov3_d.generate(sam_d, fasta_d)
 ```
 
 ```bash
-$ python -m pycov3
+$ python -m pycov3 -h
 #or
-$ pycov3
+$ pycov3 -h
 ```
 
 ## The Makefile
