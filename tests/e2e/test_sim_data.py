@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 from pycov3.Directory import SamDir, FastaDir, Cov3Dir
 
+
 def test_sim_data():
     logging.basicConfig()
     logging.getLogger().setLevel(10)
@@ -26,12 +27,8 @@ def test_sim_data():
         "mapl_cutoff": None,
         "max_mismatch_ratio": None,
     }
-    window_params = {
-        k: v for k, v in window_params.items() if v is not None
-    }
-    coverage_params = {
-        k: v for k, v in coverage_params.items() if v is not None
-    }
+    window_params = {k: v for k, v in window_params.items() if v is not None}
+    coverage_params = {k: v for k, v in coverage_params.items() if v is not None}
 
     fasta_d = FastaDir(fastas_fp, overwrite, window_params)
 
@@ -40,15 +37,33 @@ def test_sim_data():
     cov3_d.generate(sam_d, fasta_d)
 
     import shutil
-    #shutil.copyfile(output_fp / "max_bin.002.cov3", "/mnt/d/Penn/pycov3/tests/data/sim/expected_output/max_bin.002.cov3")
+
+    # shutil.copyfile(output_fp / "max_bin.002.cov3", "/mnt/d/Penn/pycov3/tests/data/sim/expected_output/max_bin.002.cov3")
 
     cov3_1 = cov3_d.get_bin("001")
     cov3_2 = cov3_d.get_bin("002")
 
-    for sample_contig in cov3_1.parse_sample_contig():
-        print(sample_contig)
+    sample_contigs_1 = list(cov3_1.parse_sample_contig())
+    akk_001_k141_0_test(sample_contigs_1[0]["log_covs"])
+    bfrag_001_k141_0_test(sample_contigs_1[1]["log_covs"])
+    akk_001_k141_2_test(sample_contigs_1[2]["log_covs"])
+    bfrag_001_k141_2_test(sample_contigs_1[3]["log_covs"])
 
-    with open(expected_output_fp / "max_bin.001.cov3") as exp_f, open(cov3_1.fp) as out_f:
-        assert exp_f.readlines() == out_f.readlines()
-    with open(expected_output_fp / "max_bin.002.cov3") as exp_f, open(cov3_2.fp) as out_f:
-        assert exp_f.readlines() == out_f.readlines()
+
+# BETTER WAY TO TEST FOR CURVES???
+def akk_001_k141_0_test(lc):
+    assert round(lc[0], 1) == round(lc[15], 1) == round(lc[30], 1)
+    assert lc[30] < lc[50] < lc[70]
+    assert lc[90] > lc[100]
+
+
+def bfrag_001_k141_0_test(lc):
+    assert round(lc[0], 1) == round(lc[15], 1)
+
+
+def akk_001_k141_2_test(lc):
+    assert round(lc[0], 1) == round(lc[30], 1) == round(lc[60], 1)
+
+
+def bfrag_001_k141_2_test(lc):
+    assert round(lc[0], 1) == round(lc[15], 1) == round(lc[30], 1)

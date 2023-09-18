@@ -24,9 +24,7 @@ from .Directory import FastaDir, SamDir, Cov3Dir
 
 def main(argv=None):
     p = argparse.ArgumentParser()
-    p.add_argument(
-        "-S", "--sam_dir", help="the directory containing the sam file(s)"
-    )
+    p.add_argument("-S", "--sam_dir", help="the directory containing the sam file(s)")
     p.add_argument(
         "-F",
         "--fasta_dir",
@@ -110,15 +108,13 @@ def main(argv=None):
         "mapl_cutoff": args.mapl_cutoff,
         "max_mismatch_ratio": args.max_mismatch_ratio,
     }
-    window_params = {
-        k: v for k, v in window_params.items() if v is not None
-    }
-    coverage_params = {
-        k: v for k, v in coverage_params.items() if v is not None
-    }
+    window_params = {k: v for k, v in window_params.items() if v is not None}
+    coverage_params = {k: v for k, v in coverage_params.items() if v is not None}
 
     fasta_d = FastaDir(Path(args.fasta_dir), args.overwrite, window_params)
 
-    cov3_d = Cov3Dir(Path(args.out_dir), args.overwrite, fasta_d.get_filenames(), coverage_params)
+    cov3_d = Cov3Dir(
+        Path(args.out_dir), args.overwrite, fasta_d.get_filenames(), coverage_params
+    )
 
     cov3_d.generate(sam_d, fasta_d)

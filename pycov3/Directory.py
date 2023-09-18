@@ -21,9 +21,7 @@ class Directory(ABC):
 
 
 class FastaDir(Directory):
-    def __init__(
-        self, fp: Path, overwrite: bool, window_params: dict
-    ) -> None:
+    def __init__(self, fp: Path, overwrite: bool, window_params: dict) -> None:
         super().__init__(fp, overwrite)
 
         self.files = [
@@ -32,11 +30,9 @@ class FastaDir(Directory):
             if str(x).endswith((".fasta", ".fa", ".fna"))
         ]
         if not self.files:
-            logging.error(
-                f"No files found ending in .fasta, .fa, or .fna in {self.fp}"
-            )
+            logging.error(f"No files found ending in .fasta, .fa, or .fna in {self.fp}")
             raise ValueError
-    
+
     def get_bin(self, bin: str) -> FastaFile:
         fasta_l = [f for f in self.files if f.bin == bin]
         if len(fasta_l) != 1:
@@ -49,9 +45,7 @@ class SamDir(Directory):
     def __init__(self, fp: Path, overwrite: bool) -> None:
         super().__init__(fp, overwrite)
 
-        self.files = [
-            SamFile(x) for x in self.fp.iterdir() if str(x).endswith(".sam")
-        ]
+        self.files = [SamFile(x) for x in self.fp.iterdir() if str(x).endswith(".sam")]
         if not self.files:
             logging.error(f"No files found ending in .sam in {self.fp}")
             raise ValueError
@@ -66,7 +60,7 @@ class SamDir(Directory):
                     if not char.isdigit():
                         cutoff = index
                         break
-                
+
                 try:
                     cigar_val = int(line["cigar"][:cutoff])
                     if cigar_val > edge_length:
@@ -86,7 +80,9 @@ class SamDir(Directory):
 
 
 class Cov3Dir(Directory):
-    def __init__(self, fp: Path, overwrite: bool, fns: list, coverage_params: dict) -> None:
+    def __init__(
+        self, fp: Path, overwrite: bool, fns: list, coverage_params: dict
+    ) -> None:
         super().__init__(fp, overwrite)
 
         if not fp.exists():
@@ -98,8 +94,11 @@ class Cov3Dir(Directory):
             )
             raise ValueError
 
-        self.files = [Cov3File(fp / f"{fn}.cov3", fn.split(".")[-1], **coverage_params) for fn in fns]
-    
+        self.files = [
+            Cov3File(fp / f"{fn}.cov3", fn.split(".")[-1], **coverage_params)
+            for fn in fns
+        ]
+
     def generate(self, sam_d: SamDir, fasta_d: FastaDir):
         for cov3 in self.files:
             cov3.write(sam_d.get_bin(cov3.bin), fasta_d.get_bin(cov3.bin))
