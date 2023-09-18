@@ -114,8 +114,8 @@ class SamFile(File):
             for line in sam_file:
                 if line.startswith("@"):
                     if line.startswith("@SQ"):
-                        contig_name = line.split(" ")[1][3:]
-                        contig_length = int(line.split(" ")[2][3:])
+                        contig_name = line.split("\t")[1][3:]
+                        contig_length = int(line.split("\t")[2][3:])
                         lengths[contig_name] = contig_length
                 else:
                     break
