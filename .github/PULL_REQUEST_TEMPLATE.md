@@ -14,3 +14,7 @@ _Describe more what you did on changes._
 
 ### Checks
 
+If this is for a release:
+ [ ] I have updated the version number in `pycov3/VERSION`
+ [ ] I have updated the README with any appropriate documentation
+ [ ] I have updated `tests` with any appropriate tests
