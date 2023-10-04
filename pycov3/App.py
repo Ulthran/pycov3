@@ -5,8 +5,19 @@ from typing import Dict, Iterator, List, Tuple
 
 from .Sequence import Contig
 
-class Cov3Generator():
-    def __init__(self, sam_generators: Dict[str, Iterator[dict]], fasta_generator: Iterator[Tuple[str, str]], sample: str, bin_name: str, window_params: dict, mapq_cutoff: int, mapl_cutoff: int, max_mismatch_ratio: float):
+
+class Cov3Generator:
+    def __init__(
+        self,
+        sam_generators: Dict[str, Iterator[dict]],
+        fasta_generator: Iterator[Tuple[str, str]],
+        sample: str,
+        bin_name: str,
+        window_params: dict,
+        mapq_cutoff: int,
+        mapl_cutoff: int,
+        max_mismatch_ratio: float,
+    ):
         self.sam_generators = sam_generators
         self.fasta_generator = fasta_generator
         self.sample = sample
@@ -21,7 +32,9 @@ class Cov3Generator():
 
     def generate_cov3(self) -> Iterator[dict]:
         next_lines = OrderedDict(
-            sorted({name: next(sg, {}) for name, sg in self.sam_generators.items()}.items())
+            sorted(
+                {name: next(sg, {}) for name, sg in self.sam_generators.items()}.items()
+            )
         )
 
         for contig_name, seq in self.fasta_generator:
@@ -129,7 +142,9 @@ class Cov3Generator():
                 cov_window_sum -= cov_step.pop(0)
                 if avg_cov_window > self.min_cov_window:
                     log_cov = round(math.log(avg_cov_window) / math.log(2), 4)
-                    qualified_info.append({"log_cov": log_cov, "GC_content": gc_content})
+                    qualified_info.append(
+                        {"log_cov": log_cov, "GC_content": gc_content}
+                    )
 
         if n >= self.min_window_count and len(qualified_info) == n:
             return qualified_info

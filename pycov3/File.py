@@ -195,10 +195,19 @@ class Cov3File(File):
 
     def write(self, sams: list, fasta: FastaFile, window_params: dict):
         sam_generators = {sam.fp.stem: sam.parse() for sam in sams}
-        cov3_generator = Cov3Generator(sam_generators, fasta.parse(), fasta.sample, fasta.bin_name, window_params, self.mapq_cutoff, self.mapl_cutoff, self.max_mismatch_ratio)
+        cov3_generator = Cov3Generator(
+            sam_generators,
+            fasta.parse(),
+            fasta.sample,
+            fasta.bin_name,
+            window_params,
+            self.mapq_cutoff,
+            self.mapl_cutoff,
+            self.max_mismatch_ratio,
+        )
 
         with open(self.fp, "w") as f_out:
-            f_out.write("") # Write header
+            f_out.write("")  # Write header
             for line in cov3_generator.generate_cov3():
                 f_out.write(",".join([str(v) for v in line.values()]))
                 f_out.write("\n")

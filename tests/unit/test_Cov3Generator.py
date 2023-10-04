@@ -9,6 +9,7 @@ from tests.unit.utils import (
     create_sample_sam_file,
 )
 
+
 def test_cov3_generator_generate_cov3():
     # Test generate_cov3() method of Cov3Generator
     sam_file_path = Path("sams/Akk_001.sam")
@@ -20,9 +21,24 @@ def test_cov3_generator_generate_cov3():
     create_sample_fasta_file(fasta_file_path)
     fasta_file = FastaFile(fasta_file_path)
 
-    cov3_generator = Cov3Generator({s.fp.stem: s.parse() for s in sam_dir.files}, fasta_file.parse(), "Akk", "001", {"window_size": 500, "window_step": 10, "edge_length": sam_dir.calculate_edge_length()}, 1, 30, 0.03)
+    cov3_generator = Cov3Generator(
+        {s.fp.stem: s.parse() for s in sam_dir.files},
+        fasta_file.parse(),
+        "Akk",
+        "001",
+        {
+            "window_size": 500,
+            "window_step": 10,
+            "edge_length": sam_dir.calculate_edge_length(),
+        },
+        1,
+        30,
+        0.03,
+    )
 
-    assert list(cov3_generator.generate_cov3()) == [] # Test data is too small for window_size min
+    assert (
+        list(cov3_generator.generate_cov3()) == []
+    )  # Test data is too small for window_size min
 
 
 def test_cov3_file_update_coverages():
@@ -32,12 +48,23 @@ def test_cov3_file_update_coverages():
     sam_file = SamFile(sam_file_path)
     sam_lines = list(sam_file.parse())
 
-    cov3_generator = Cov3Generator([sam_file.parse()], None, "Akk", "001", {"window_size": 500, "window_step": 10, "edge_length": 5}, 1, 30, 0.03)
+    cov3_generator = Cov3Generator(
+        [sam_file.parse()],
+        None,
+        "Akk",
+        "001",
+        {"window_size": 500, "window_step": 10, "edge_length": 5},
+        1,
+        30,
+        0.03,
+    )
 
     coverages = {}
 
     for line in sam_lines:
-        coverages = cov3_generator._Cov3Generator__update_coverages(coverages, line, 2, 2)
+        coverages = cov3_generator._Cov3Generator__update_coverages(
+            coverages, line, 2, 2
+        )
 
     assert coverages == {
         -1: 2,
@@ -71,7 +98,16 @@ def test_cov3_file_log_cov_info():
     fasta_file = FastaFile(fasta_file_path)
     fasta_records = list(fasta_file.parse())
 
-    cov3_generator = Cov3Generator([], fasta_file.parse(), "Akk", "001", {"window_size": 500, "window_step": 10, "edge_length": 5}, 1, 30, 0.03)
+    cov3_generator = Cov3Generator(
+        [],
+        fasta_file.parse(),
+        "Akk",
+        "001",
+        {"window_size": 500, "window_step": 10, "edge_length": 5},
+        1,
+        30,
+        0.03,
+    )
 
     contig = Contig(
         fasta_records[0][0], fasta_records[0][1] * 10, "Akk0", "001", 5, 500, 10
@@ -82,7 +118,25 @@ def test_cov3_file_log_cov_info():
     coverages[599] = 0
 
     info = cov3_generator._Cov3Generator__log_cov_info(contig, coverages, 5, 500, 10)
-    assert info == [{'log_cov': -2.3219, 'GC_content': 0.496}, {'log_cov': -2.3219, 'GC_content': 0.496}, {'log_cov': -2.3219, 'GC_content': 0.5}, {'log_cov': -2.3219, 'GC_content': 0.504}, {'log_cov': -2.3219, 'GC_content': 0.504}, {'log_cov': -2.3219, 'GC_content': 0.502}, {'log_cov': -2.3219, 'GC_content': 0.498}, {'log_cov': -2.3219, 'GC_content': 0.496}, {'log_cov': -2.3219, 'GC_content': 0.496}, {'log_cov': -2.3219, 'GC_content': 0.5}, {'log_cov': -2.3219, 'GC_content': 0.504}, {'log_cov': -2.3219, 'GC_content': 0.504}, {'log_cov': -2.3219, 'GC_content': 0.502}, {'log_cov': -2.3219, 'GC_content': 0.498}, {'log_cov': -2.3219, 'GC_content': 0.496}, {'log_cov': -2.3219, 'GC_content': 0.498}, {'log_cov': -2.3219, 'GC_content': 0.502}]
+    assert info == [
+        {"log_cov": -2.3219, "GC_content": 0.496},
+        {"log_cov": -2.3219, "GC_content": 0.496},
+        {"log_cov": -2.3219, "GC_content": 0.5},
+        {"log_cov": -2.3219, "GC_content": 0.504},
+        {"log_cov": -2.3219, "GC_content": 0.504},
+        {"log_cov": -2.3219, "GC_content": 0.502},
+        {"log_cov": -2.3219, "GC_content": 0.498},
+        {"log_cov": -2.3219, "GC_content": 0.496},
+        {"log_cov": -2.3219, "GC_content": 0.496},
+        {"log_cov": -2.3219, "GC_content": 0.5},
+        {"log_cov": -2.3219, "GC_content": 0.504},
+        {"log_cov": -2.3219, "GC_content": 0.504},
+        {"log_cov": -2.3219, "GC_content": 0.502},
+        {"log_cov": -2.3219, "GC_content": 0.498},
+        {"log_cov": -2.3219, "GC_content": 0.496},
+        {"log_cov": -2.3219, "GC_content": 0.498},
+        {"log_cov": -2.3219, "GC_content": 0.502},
+    ]
 
 
 def test_cov3_file_calculate_mapl():
