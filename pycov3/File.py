@@ -204,6 +204,8 @@ class Cov3File(File):
         )
 
         with open(self.fp, "w") as f_out:
+            f_out.write("") # Write header
+
             for contig_name, seq in fasta.parse():
                 contig = Contig(
                     contig_name, seq, fasta.sample, fasta.bin_name, **window_params
