@@ -1,7 +1,7 @@
 import logging
 import math
 from collections import OrderedDict
-from typing import Dict, Iterator, List, Tuple
+from typing import Dict, Iterator, List, Tuple, Union
 
 from .Sequence import Contig
 
@@ -9,15 +9,15 @@ from .Sequence import Contig
 class Cov3Generator:
     def __init__(
         self,
-        sam_generators: Dict[str, Iterator[dict]],
+        sam_generators: Dict[str, Iterator[Dict[str, Union[str, int]]]],
         fasta_generator: Iterator[Tuple[str, str]],
         sample: str,
         bin_name: str,
-        window_params: dict,
+        window_params: Dict[str, int],
         mapq_cutoff: int,
         mapl_cutoff: int,
         max_mismatch_ratio: float,
-    ):
+    ) -> None:
         self.sam_generators = sam_generators
         self.fasta_generator = fasta_generator
         self.sample = sample
@@ -30,7 +30,7 @@ class Cov3Generator:
         self.min_cov_window = 0.1
         self.min_window_count = 5
 
-    def generate_cov3(self) -> Iterator[dict]:
+    def generate_cov3(self) -> Iterator[Dict[str, Union[str, int, float]]]:
         next_lines = OrderedDict(
             sorted(
                 {name: next(sg, {}) for name, sg in self.sam_generators.items()}.items()
@@ -80,8 +80,12 @@ class Cov3Generator:
                         yield info
 
     def __update_coverages(
-        self, coverages: dict, line: dict, edge_length: int, window_step: int
-    ) -> dict:
+        self,
+        coverages: Dict[int, int],
+        line: Dict[str, Union[str, int]],
+        edge_length: int,
+        window_step: int,
+    ) -> Dict[int, int]:
         mapl = self.calculate_mapl(line["cigar"])
         if (
             line["mapping_quality"] >= self.mapq_cutoff
@@ -112,11 +116,11 @@ class Cov3Generator:
     def __log_cov_info(
         self,
         contig: Contig,
-        coverages: dict,
+        coverages: Dict[int, int],
         edge_length: int,
         window_size: int,
         window_step: int,
-    ) -> List[dict]:
+    ) -> List[Dict[str, float]]:
         first_i = contig.windows[0].start
         last_i = contig.windows[-1].end
         first_step = int((first_i - 1 - edge_length) / window_step)

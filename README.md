@@ -48,6 +48,23 @@ Create a SAM directory and FASTA directory, set any non-default window or covera
     cov3_d.generate(sam_d, fasta_d)
 ```
 
+Alternatively, to use the bare application logic and do all the file handling yourself, you can use the `Cov3Generator` class which takes a list of generators as SAM inputs and a generator as a FASTA input.
+
+```py
+    from pycov3.Cov3Generator import Cov3Generator
+
+    cov3_generator = Cov3Generator(
+        sam_generators,
+        fasta_generator,
+        sample,
+        bin_name,
+        window_params,
+        **coverage_params,
+    )
+
+    cov3_dict = cov3_generator.generate()
+```
+
 ```bash
 $ python -m pycov3 -h
 #or

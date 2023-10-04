@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from pycov3.Directory import SamDir
+from src.pycov3.Directory import SamDir
 from tests.unit.utils import create_sample_sam_file
 
 dummy_sam_files = [

@@ -1,5 +1,5 @@
 import pytest
-from pycov3.Sequence import Window
+from src.pycov3.Sequence import Window
 
 
 def test_valid_initialization():

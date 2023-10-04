@@ -1,5 +1,5 @@
 import pytest
-from pycov3.Sequence import Contig
+from src.pycov3.Sequence import Contig
 
 
 def test_valid_initialization():

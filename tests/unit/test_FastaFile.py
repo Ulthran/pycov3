@@ -1,5 +1,5 @@
 from pathlib import Path
-from pycov3.File import FastaFile
+from src.pycov3.File import FastaFile
 from tests.unit.utils import create_sample_fasta_file
 
 

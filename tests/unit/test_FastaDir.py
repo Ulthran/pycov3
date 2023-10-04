@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from pycov3.Directory import FastaDir
+from src.pycov3.Directory import FastaDir
 from tests.unit.utils import create_sample_fasta_file
 
 dummy_fasta_files = [

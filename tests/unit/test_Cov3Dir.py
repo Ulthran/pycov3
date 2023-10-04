@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from pycov3.Directory import Cov3Dir
+from src.pycov3.Directory import Cov3Dir
 
 window_params = {
     "window_size": 500,

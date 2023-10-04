@@ -1,5 +1,5 @@
 from pathlib import Path
-from pycov3.File import SamFile
+from src.pycov3.File import SamFile
 from tests.unit.utils import create_sample_sam_file
 
 

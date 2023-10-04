@@ -1,9 +1,9 @@
 import os
 from pathlib import Path
-from pycov3.Directory import SamDir
-from pycov3.File import SamFile, FastaFile
-from pycov3.App import Cov3Generator
-from pycov3.Sequence import Contig
+from src.pycov3.Directory import SamDir
+from src.pycov3.File import SamFile, FastaFile
+from src.pycov3.App import Cov3Generator
+from src.pycov3.Sequence import Contig
 from tests.unit.utils import (
     create_sample_fasta_file,
     create_sample_sam_file,

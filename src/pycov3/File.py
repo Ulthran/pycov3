@@ -1,8 +1,8 @@
 import logging
-import math
 from abc import ABC, abstractmethod
 from itertools import groupby
 from pathlib import Path
+from typing import Dict, Iterator, List, Tuple, Union
 
 from .App import Cov3Generator
 
@@ -43,7 +43,7 @@ class FastaFile(File):
                 f"FASTA filename {self.fp} not of format {{sample}}.{{bin_name}}.fasta/.fa/.fna"
             )
 
-    def parse(self) -> list:
+    def parse(self) -> Iterator[Tuple[str, str]]:
         with open(self.fp) as f:
             faiter = (x[1] for x in groupby(f, lambda line: line[0] == ">"))
 
@@ -67,7 +67,7 @@ class SamFile(File):
         self.sample = stem[0]
         self.bin_name = stem[1].split(".")[0]
 
-    def parse(self) -> list:
+    def parse(self) -> Iterator[Dict[str, Union[str, int]]]:
         with open(self.fp, "r") as f:
             for line in f:
                 if line.startswith("@"):
@@ -101,7 +101,7 @@ class SamFile(File):
                 }
                 yield parsed_read
 
-    def parse_contig_lengths(self) -> list:
+    def parse_contig_lengths(self) -> Dict[str, int]:
         lengths = {}
         with open(self.fp, "r") as sam_file:
             for line in sam_file:
@@ -148,7 +148,7 @@ class Cov3File(File):
                 f"Max mismatch ratio of {self.max_mismatch_ratio} is not between 0.01 and 0.30"
             )
 
-    def parse(self):
+    def parse(self) -> Iterator[Dict[str, Union[str, int, float]]]:
         with open(self.fp) as f:
             for line in f.readlines():
                 fields = line.split(",")
@@ -160,7 +160,7 @@ class Cov3File(File):
                     "length": int(fields[4]),
                 }
 
-    def parse_sample_contig(self):
+    def parse_sample_contig(self) -> Iterator[Dict[str, Union[str, int, List[float]]]]:
         with open(self.fp) as f:
             data_dict = {}
             for line in f.readlines():
@@ -193,7 +193,9 @@ class Cov3File(File):
             for values in data_dict.values():
                 yield values
 
-    def write(self, sams: list, fasta: FastaFile, window_params: dict):
+    def write(
+        self, sams: List[SamFile], fasta: FastaFile, window_params: Dict[str, int]
+    ) -> None:
         sam_generators = {sam.fp.stem: sam.parse() for sam in sams}
         cov3_generator = Cov3Generator(
             sam_generators,

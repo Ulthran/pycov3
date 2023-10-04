@@ -1,5 +1,5 @@
 from pathlib import Path
-from pycov3.File import Cov3File
+from src.pycov3.File import Cov3File
 from tests.unit.utils import create_sample_cov3_file
 
 
