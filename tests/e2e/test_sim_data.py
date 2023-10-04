@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from pycov3.Directory import SamDir, FastaDir, Cov3Dir
+from src.pycov3.Directory import SamDir, FastaDir, Cov3Dir
 
 
 def test_sim_data():

@@ -1,6 +1,7 @@
 import logging
 from abc import ABC
 from pathlib import Path
+from typing import Dict, List, Union
 
 from .File import FastaFile, SamFile, Cov3File
 
@@ -15,7 +16,7 @@ class Directory(ABC):
         if not fp.is_dir() and fp.exists():
             raise ValueError(f"{self.fp} is not a directory")
 
-    def get_filenames(self) -> list:
+    def get_filenames(self) -> List[str]:
         return [".".join(f.fp.name.split(".")[:-1]) for f in self.files]
 
 
@@ -75,7 +76,7 @@ class SamDir(Directory):
 
         return edge_length
 
-    def get_bin(self, bin_name: str) -> list:
+    def get_bin(self, bin_name: str) -> List[SamFile]:
         return [s for s in self.files if s.bin_name == bin_name]
 
 
@@ -84,9 +85,9 @@ class Cov3Dir(Directory):
         self,
         fp: Path,
         overwrite: bool,
-        fns: list,
-        window_params: dict,
-        coverage_params: dict,
+        fns: List[str],
+        window_params: Dict[str, int],
+        coverage_params: Dict[str, Union[int, float]],
     ) -> None:
         super().__init__(fp, overwrite)
         self.window_params = window_params
@@ -104,7 +105,7 @@ class Cov3Dir(Directory):
             for fn in fns
         ]
 
-    def generate(self, sam_d: SamDir, fasta_d: FastaDir):
+    def generate(self, sam_d: SamDir, fasta_d: FastaDir) -> None:
         for cov3 in self.files:
             cov3.write(
                 sam_d.get_bin(cov3.bin_name),
