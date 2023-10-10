@@ -19,6 +19,7 @@ def create_sample_fasta_file(fasta_file_path):
 def create_sample_cov3_file(cov3_file_path):
     # Create a sample cov3 file for testing
     sample_cov3_content = [
+        "log_cov,GC_content,sample,contig,length\n",
         "1.234,0.567,sample1,contig1,100\n",
         "1.234,0.567,sample1,contig1,100\n",
         "2.345,0.678,sample1,contig2,150\n",

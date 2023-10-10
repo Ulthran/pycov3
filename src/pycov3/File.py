@@ -150,6 +150,7 @@ class Cov3File(File):
 
     def parse(self) -> Iterator[Dict[str, Union[str, int, float]]]:
         with open(self.fp) as f:
+            f.readline()  # Skip header
             for line in f.readlines():
                 fields = line.split(",")
                 yield {
@@ -163,6 +164,7 @@ class Cov3File(File):
     def parse_sample_contig(self) -> Iterator[Dict[str, Union[str, int, List[float]]]]:
         with open(self.fp) as f:
             data_dict = {}
+            f.readline()  # Skip header
             for line in f.readlines():
                 fields = line.split(",")
                 parsed_line = {
@@ -209,7 +211,9 @@ class Cov3File(File):
         )
 
         with open(self.fp, "w") as f_out:
-            f_out.write("")  # Write header
+            f_out.write(
+                ",".join(["log_cov", "GC_content", "sample", "contig", "length"])
+            )  # Write header
             for line in cov3_generator.generate_cov3():
                 f_out.write(",".join([str(v) for v in line.values()]))
                 f_out.write("\n")
