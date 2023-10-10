@@ -150,6 +150,7 @@ class Cov3File(File):
 
     def parse(self) -> Iterator[Dict[str, Union[str, int, float]]]:
         with open(self.fp) as f:
+            f.readline()  # Skip header
             for line in f.readlines():
                 fields = line.split(",")
                 yield {
@@ -163,6 +164,7 @@ class Cov3File(File):
     def parse_sample_contig(self) -> Iterator[Dict[str, Union[str, int, List[float]]]]:
         with open(self.fp) as f:
             data_dict = {}
+            f.readline()  # Skip header
             for line in f.readlines():
                 fields = line.split(",")
                 parsed_line = {
@@ -194,7 +196,10 @@ class Cov3File(File):
                 yield values
 
     def write(
-        self, sams: List[SamFile], fasta: FastaFile, window_params: Dict[str, int]
+        self,
+        sams: List[SamFile],
+        fasta: FastaFile,
+        window_params: Dict[str, int],
     ) -> None:
         sam_generators = {sam.fp.stem: sam.parse() for sam in sams}
         cov3_generator = Cov3Generator(
@@ -208,8 +213,13 @@ class Cov3File(File):
             self.max_mismatch_ratio,
         )
 
+        self.write_generator(cov3_generator)
+
+    def write_generator(self, cov3_generator: Cov3Generator) -> None:
         with open(self.fp, "w") as f_out:
-            f_out.write("")  # Write header
+            f_out.write(
+                ",".join(["log_cov", "GC_content", "sample", "contig", "length"])
+            )  # Write header
             for line in cov3_generator.generate_cov3():
                 f_out.write(",".join([str(v) for v in line.values()]))
                 f_out.write("\n")

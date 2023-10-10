@@ -53,6 +53,7 @@ Alternatively, to use the bare application logic and do all the file handling yo
 
 ```py
     from pycov3.Cov3Generator import Cov3Generator
+    from pycov3.File import Cov3File
 
     cov3_generator = Cov3Generator(
         sam_generators,
@@ -63,7 +64,11 @@ Alternatively, to use the bare application logic and do all the file handling yo
         **coverage_params,
     )
 
-    cov3_dict = cov3_generator.generate()
+    cov3_dict = cov3_generator.generate_cov3()
+
+    # Write output
+    cov3_file = Cov3File(Path(/path/to/output/), "001")
+    cov3_file.write_generator(cov3_generator.generate_cov3())
 ```
 
 ```bash
