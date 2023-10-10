@@ -196,19 +196,24 @@ class Cov3File(File):
                 yield values
 
     def write(
-        self, sams: List[SamFile], fasta: FastaFile, window_params: Dict[str, int]
+        self,
+        sams: List[SamFile],
+        fasta: FastaFile,
+        window_params: Dict[str, int],
+        cov3_generator: Cov3Generator = None,
     ) -> None:
-        sam_generators = {sam.fp.stem: sam.parse() for sam in sams}
-        cov3_generator = Cov3Generator(
-            sam_generators,
-            fasta.parse(),
-            fasta.sample,
-            fasta.bin_name,
-            window_params,
-            self.mapq_cutoff,
-            self.mapl_cutoff,
-            self.max_mismatch_ratio,
-        )
+        if not cov3_generator:
+            sam_generators = {sam.fp.stem: sam.parse() for sam in sams}
+            cov3_generator = Cov3Generator(
+                sam_generators,
+                fasta.parse(),
+                fasta.sample,
+                fasta.bin_name,
+                window_params,
+                self.mapq_cutoff,
+                self.mapl_cutoff,
+                self.max_mismatch_ratio,
+            )
 
         with open(self.fp, "w") as f_out:
             f_out.write(
