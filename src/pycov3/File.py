@@ -200,21 +200,22 @@ class Cov3File(File):
         sams: List[SamFile],
         fasta: FastaFile,
         window_params: Dict[str, int],
-        cov3_generator: Cov3Generator = None,
     ) -> None:
-        if not cov3_generator:
-            sam_generators = {sam.fp.stem: sam.parse() for sam in sams}
-            cov3_generator = Cov3Generator(
-                sam_generators,
-                fasta.parse(),
-                fasta.sample,
-                fasta.bin_name,
-                window_params,
-                self.mapq_cutoff,
-                self.mapl_cutoff,
-                self.max_mismatch_ratio,
-            )
+        sam_generators = {sam.fp.stem: sam.parse() for sam in sams}
+        cov3_generator = Cov3Generator(
+            sam_generators,
+            fasta.parse(),
+            fasta.sample,
+            fasta.bin_name,
+            window_params,
+            self.mapq_cutoff,
+            self.mapl_cutoff,
+            self.max_mismatch_ratio,
+        )
 
+        self.write_generator(cov3_generator)
+
+    def write_generator(self, cov3_generator: Cov3Generator) -> None:
         with open(self.fp, "w") as f_out:
             f_out.write(
                 ",".join(["log_cov", "GC_content", "sample", "contig", "length"])
