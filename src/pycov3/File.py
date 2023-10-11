@@ -220,6 +220,7 @@ class Cov3File(File):
             f_out.write(
                 ",".join(["log_cov", "GC_content", "sample", "contig", "length"])
             )  # Write header
+            f_out.write("\n")
             for line in cov3_generator.generate_cov3():
                 f_out.write(",".join([str(v) for v in line.values()]))
                 f_out.write("\n")
