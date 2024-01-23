@@ -2,11 +2,6 @@ name: Test Package
 
 on:
   workflow_call:
-    secrets:
-        CCT:
-            required: true
-        GHT:
-            required: true
 
   workflow_dispatch:
 
@@ -34,7 +29,7 @@ jobs:
       - name: "Upload coverage to Codecov"
         uses: codecov/codecov-action@v3
         env:
-          CODECOV_TOKEN: ${{ secrets.CCT }}
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         # with:
         #   fail_ci_if_error: true
 
@@ -86,6 +81,6 @@ jobs:
         uses: github/super-linter@v5
         env:
           VALIDATE_ALL_CODEBASE: true
-          GITHUB_TOKEN: ${{ secrets.GHT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
           VALIDATE_PYTHON_BLACK: true
