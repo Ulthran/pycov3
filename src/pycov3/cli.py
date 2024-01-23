@@ -3,6 +3,7 @@ import logging
 import sys
 from pathlib import Path
 
+from . import __version__
 from .Directory import FastaDir, SamDir, Cov3Dir
 
 ###
@@ -87,6 +88,14 @@ def main(argv=None):
         type=int,
         help="Sets the log level, default is info, 10 for debug (Default: 20)",
         default=20,
+    )
+    
+    p.add_argument(
+        "-V",
+        "-v",
+        "--version",
+        action="version",
+        version=__version__,
     )
 
     args = p.parse_args(argv)
