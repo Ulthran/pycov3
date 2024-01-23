@@ -1,4 +1,4 @@
-name: Test Package on PR
+name: Tests
 
 on:
   push:

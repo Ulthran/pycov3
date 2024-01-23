@@ -1,11 +1,11 @@
 # pycov3
 
-[![CI](https://github.com/Ulthran/pycov3/actions/workflows/main.yml/badge.svg)](https://github.com/Ulthran/pycov3/actions/workflows/main.yml)
+
 [![codecov](https://codecov.io/gh/Ulthran/pycov3/graph/badge.svg?token=HH27P1FDM5)](https://codecov.io/gh/Ulthran/pycov3)
 [![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com/)
-[![Super-Linter](https://github.com/Ulthran/pycov3/actions/workflows/linter.yml/badge.svg)](https://github.com/Ulthran/pycov3/actions/workflows/linter.yml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/a2c7aa4e154d4bae82246d5f950afa9c)](https://app.codacy.com/gh/Ulthran/pycov3/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![PyPI version](https://badge.fury.io/py/pycov3.svg)](https://pypi.org/project/pycov3/)
+[![DockerHub](https://img.shields.io/docker/pulls/ctbushman/pycov3)](https://hub.docker.com/repository/docker/ctbushman/pycov3/)
 
 A package for generating cov3 files which are generated from sam files giving coverage information and a fasta file giving binned contigs. Cov3 files are used as input for the [DEMIC R package](https://github.com/Ulthran/DEMIC) which calculates PTR, an estimate for bacterial growth rates.
 
