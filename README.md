@@ -1,7 +1,7 @@
 # pycov3
 
 [![CI](https://github.com/Ulthran/pycov3/actions/workflows/main.yml/badge.svg)](https://github.com/Ulthran/pycov3/actions/workflows/main.yml)
-[![codecov](https://codecov.io/gh/Ulthran/pycov3/branch/main/graph/badge.svg)](https://codecov.io/gh/Ulthran/pycov3)
+[![codecov](https://codecov.io/gh/Ulthran/pycov3/graph/badge.svg?token=HH27P1FDM5)](https://codecov.io/gh/Ulthran/pycov3)
 [![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com/)
 [![Super-Linter](https://github.com/Ulthran/pycov3/actions/workflows/linter.yml/badge.svg)](https://github.com/Ulthran/pycov3/actions/workflows/linter.yml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/a2c7aa4e154d4bae82246d5f950afa9c)](https://app.codacy.com/gh/Ulthran/pycov3/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
