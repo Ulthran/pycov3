@@ -28,6 +28,8 @@ jobs:
             echo "Versions match, continuing..."
           else
             echo "Versions don't match, exiting..."
+            echo "Library version: $LIBRARY_VERSION"
+            echo "GitHub version: $GITHUB_VERSION"
             exit 1
           fi
 
