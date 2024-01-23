@@ -1,4 +1,4 @@
-name: Test Package
+name: Test Package on PR
 
 on:
   push:
@@ -6,91 +6,11 @@ on:
   pull_request:
     branches: [ main ]
 
-  workflow_call:
-    secrets:
-        CODECOV_TOKEN:
-            required: true
-        GITHUB_TOKEN:
-            required: true
-
   workflow_dispatch:
 
 jobs:
-  tests_linux:
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [3.9]
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install project
-        run: pip install -e .[test]
-      - name: Run tests
-        run: pytest -s -vvvv -l --tb=long tests
-      - name: Generate coverage report
-        run: |
-          pytest --cov .
-          cp .coverage ../
-      - name: "Upload coverage to Codecov"
-        uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        # with:
-        #   fail_ci_if_error: true
-
-  tests_mac:
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [3.9]
-        os: [macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install project
-        run: pip install -e .[test]
-      - name: Run tests
-        run: pytest -s -vvvv -l --tb=long tests
-
-  tests_win:
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [3.9]
-        os: [windows-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install Pip
-        run: pip install --user --upgrade pip
-      - name: Install project
-        run: pip install -e .[test]
-      - name: run tests
-        run: pytest -s -vvvv -l --tb=long tests
-
-  lint:
-    name: Lint Code Base
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Lint Code Base
-        uses: github/super-linter@v5
-        env:
-          VALIDATE_ALL_CODEBASE: true
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-          VALIDATE_PYTHON_BLACK: true
+  run-tests:
+    uses: Ulthran/pycov3/.github/workflows/pr.yml@main
+    secrets:
+      CCT: ${{ secrets.CODECOV_TOKEN }}
+      GHT: ${{ secrets.GITHUB_TOKEN }}
