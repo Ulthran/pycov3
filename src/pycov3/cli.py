@@ -89,7 +89,7 @@ def main(argv=None):
         help="Sets the log level, default is info, 10 for debug (Default: 20)",
         default=20,
     )
-    
+
     p.add_argument(
         "-V",
         "-v",
