@@ -9,9 +9,7 @@ on:
 jobs:
   run-tests:
     uses: Ulthran/pycov3/.github/workflows/test.yml@main
-    secrets:
-      CCT: ${{ secrets.CODECOV_TOKEN }}
-      GHT: ${{ secrets.GITHUB_TOKEN }}
+    secrets: inherit
 
   build-and-publish-to-pypi:
     runs-on: ubuntu-latest
