@@ -10,15 +10,48 @@
 
 A package for generating cov3 files which are generated from sam files giving coverage information and a fasta file giving binned contigs. Cov3 files are used as input for the [DEMIC R package](https://github.com/Ulthran/DEMIC) which calculates PTR, an estimate for bacterial growth rates.
 
-## Install it from PyPI
+## Installation
+
+### PyPi
 
 ```bash
 pip install pycov3
+pycov3 -h
+```
+
+### Bioconda
+
+```bash
+conda create -n pycov3 -c conda-forge -c bioconda pycov3
+conda activate pycov3
+pycov3 -h
+```
+
+### DockerHub
+
+```bash
+docker pull ctbushman/pycov3:latest
+docker run --rm --name pycov3 pycov3 pycov3 -h
+```
+
+### GitHub
+
+```bash
+git clone https://github.com/Ulthran/pycov3.git
+cd pycov3/
+pip install .
+pycov3 -h
 ```
 
 ## Usage
 
-Create a SAM directory and FASTA directory, set any non-default window or coverage parameters, then create a COV3 directory and use it to generate a COV3 file for each contig set in the FASTA directory.
+Use `-h` to see options for running the CLI.
+
+```bash
+$ pycov3 -h
+```
+
+You can also use the library in your own code. Create a SAM directory and FASTA directory, set any non-default window or coverage parameters, then create a COV3 directory and use it to generate a COV3 file for each contig set in the FASTA directory.
 
 ```py
     from pycov3.Directory import Cov3Dir, FastaDir, SamDir
@@ -71,10 +104,4 @@ Alternatively, to use the bare application logic and do all the file handling yo
     # Write output
     cov3_file = Cov3File(Path(/path/to/output/), "001")
     cov3_file.write_generator(cov3_generator.generate_cov3())
-```
-
-```bash
-$ python -m pycov3 -h
-#or
-$ pycov3 -h
 ```
