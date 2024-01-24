@@ -72,7 +72,7 @@ jobs:
     needs: run-tests
 
     steps:
-      - name: Check out the repo
+      - name: Checkout
         uses: actions/checkout@v4
       
       - name: Log in to Docker Hub
@@ -95,3 +95,22 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+  
+  build-and-push-to-bioconda:
+    name: Push to Bioconda
+    runs-on: ubuntu-latest
+    needs: run-tests
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup bioconda-recipes
+        run: |
+          git clone https://github.com/bioconda/bioconda-recipes.git
+      
+      # THIS WILL PROBABLY NEED TO FORK INSTEAD OF CLONE DIRECTLY, GONNA GET A LITTLE COMPLICATED
+      #- name: Autobump
+      #  run: |
+      #    cd bioconda-recipes/
+      #    bioconda-utils autobump recipes/ config.yml --commit-as Ulthran ctbushman@gmail.com --packages pycov3
