@@ -108,8 +108,16 @@ jobs:
       - name: Setup bioconda-recipes
         run: |
           git clone https://github.com/bioconda/bioconda-recipes.git
+
+      - name: Setup conda
+        uses: s-weigand/setup-conda@v1.1.0
+
+      - name: Install bioconda-utils
+        run: conda env create -n bioconda-utils -c conda-forge -c bioconda bioconda-utils
+
       
       - name: Autobump
         run: |
           cd bioconda-recipes/
+          conda activate bioconda-utils
           bioconda-utils autobump recipes/ config.yml --commit-as Ulthran ctbushman@gmail.com --packages pycov3 --dry-run
