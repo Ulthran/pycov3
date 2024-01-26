@@ -51,6 +51,8 @@ Use `-h` to see options for running the CLI.
 $ pycov3 -h
 ```
 
+The FASTAs should all be in one directory with names of the format `{sample}.{bin_name}.fasta/.fa/.fna` and the SAMs should also all be in one directory with names of the format `{sample}_{bin_name}.sam`. The output COV3 files will be written to a directory with names of the format `{sample}.{bin_name}.cov3`.
+
 You can also use the library in your own code. Create a SAM directory and FASTA directory, set any non-default window or coverage parameters, then create a COV3 directory and use it to generate a COV3 file for each contig set in the FASTA directory.
 
 ```py
@@ -108,3 +110,17 @@ Alternatively, to use the bare application logic and do all the file handling yo
 
 ## Resource Requirements
 
+Threads: pycov3 uses `multiprocessing` to parallelize processing of input fastas. Increasing `--thread_num` up to the number of input fastas should improve runtime, with no benefits beyond that number.
+
+Memory: pycov3 uses generators as much as possible. The main memory users are the `Contig` objects, which each hold a contig's sequence and information for each `Window` over its length. There is also a `coverages` dictionary that could potentially grow to the size of the largest contig (but that is very unlikely). At a minimum, twice the size of the largest contig should be given per thread.
+
+Algorithmic Complexity: Assuming enough threads are provided to have each fasta file processed separately, the time complexity is roughly `O(cwsr)`.
+
+`c`: Number of contigs in fasta
+`s`: Number of sam files
+`w`: Max number of windows per contig
+`r`: Max number of records per sam file
+
+## Help
+
+Please use the [Issues](https://github.com/Ulthran/pycov3/issues) on this repo for any problems, questions, or suggestions.

@@ -35,7 +35,7 @@ def test_sim_data():
         output_fp, overwrite, fasta_d.get_filenames(), window_params, coverage_params
     )
 
-    cov3_d.generate(sam_d, fasta_d, 1)
+    cov3_d.generate(sam_d, fasta_d, 2)
 
     # import shutil
     # shutil.copyfile(output_fp / "max_bin.002.cov3", "/mnt/d/Penn/pycov3/tests/data/sim/expected_output/max_bin.002.cov3")
