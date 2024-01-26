@@ -119,5 +119,5 @@ jobs:
       - name: Autobump
         run: |
           cd bioconda-recipes/
-          conda activate bioconda-utils
+          source activate bioconda-utils
           bioconda-utils autobump recipes/ config.yml --commit-as Ulthran ctbushman@gmail.com --packages pycov3 --dry-run
