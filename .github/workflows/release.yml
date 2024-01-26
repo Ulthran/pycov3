@@ -113,7 +113,7 @@ jobs:
         uses: s-weigand/setup-conda@v1.1.0
 
       - name: Install bioconda-utils
-        run: conda env create -n bioconda-utils -c conda-forge -c bioconda bioconda-utils
+        run: conda create -n bioconda-utils -c conda-forge -c bioconda bioconda-utils
 
       
       - name: Autobump
