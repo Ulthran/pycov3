@@ -111,7 +111,15 @@ class Cov3Dir(Directory):
         ]
 
     def generate(self, sam_d: SamDir, fasta_d: FastaDir, threads: int) -> None:
-        write_info = [(x, sam_d.get_bin(x.bin_name), fasta_d.get_bin(x.bin_name), self.window_params) for x in self.files]
+        write_info = [
+            (
+                x,
+                sam_d.get_bin(x.bin_name),
+                fasta_d.get_bin(x.bin_name),
+                self.window_params,
+            )
+            for x in self.files
+        ]
 
         with Pool(threads) as p:
             p.map(write_cov3, write_info)
