@@ -2,7 +2,7 @@ import logging
 from abc import ABC
 from multiprocessing import Pool
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Tuple, Union
 
 from .File import FastaFile, SamFile, Cov3File
 
@@ -81,6 +81,10 @@ class SamDir(Directory):
         return [s for s in self.files if s.bin_name == bin_name]
 
 
+def write_cov3(x: Tuple[Cov3File, List[SamFile], FastaFile, Dict[str, int]]) -> None:
+    x[0].write(x[1], x[2], x[3])
+
+
 class Cov3Dir(Directory):
     def __init__(
         self,
@@ -107,8 +111,10 @@ class Cov3Dir(Directory):
         ]
 
     def generate(self, sam_d: SamDir, fasta_d: FastaDir, threads: int) -> None:
+        write_info = [(x, sam_d.get_bin(x.bin_name), fasta_d.get_bin(x.bin_name), self.window_params) for x in self.files]
+
         with Pool(threads) as p:
-            p.map(lambda x: x.write(sam_d.get_bin(x.bin_name), fasta_d.get_bin(x.bin_name), self.window_params), self.files)
+            p.map(write_cov3, write_info)
 
     def get_bin(self, bin_name: str) -> Cov3File:
         result = [c for c in self.files if c.bin_name == bin_name]
