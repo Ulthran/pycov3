@@ -105,3 +105,6 @@ Alternatively, to use the bare application logic and do all the file handling yo
     cov3_file = Cov3File(Path(/path/to/output/), "001")
     cov3_file.write_generator(cov3_generator.generate_cov3())
 ```
+
+## Resource Requirements
+

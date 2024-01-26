@@ -120,4 +120,4 @@ jobs:
         run: |
           cd bioconda-recipes/
           source activate bioconda-utils
-          bioconda-utils autobump recipes/ config.yml --commit-as Ulthran ctbushman@gmail.com --packages pycov3 --dry-run
+          bioconda-utils autobump recipes/ config.yml --commit-as Ulthran ctbushman@gmail.com --check-branch --create-pr --packages pycov3 --dry-run
