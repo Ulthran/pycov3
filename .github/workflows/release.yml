@@ -109,8 +109,7 @@ jobs:
         run: |
           git clone https://github.com/bioconda/bioconda-recipes.git
       
-      # THIS WILL PROBABLY NEED TO FORK INSTEAD OF CLONE DIRECTLY, GONNA GET A LITTLE COMPLICATED
-      #- name: Autobump
-      #  run: |
-      #    cd bioconda-recipes/
-      #    bioconda-utils autobump recipes/ config.yml --commit-as Ulthran ctbushman@gmail.com --packages pycov3
+      - name: Autobump
+        run: |
+          cd bioconda-recipes/
+          bioconda-utils autobump recipes/ config.yml --commit-as Ulthran ctbushman@gmail.com --packages pycov3 --dry-run
