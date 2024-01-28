@@ -104,10 +104,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
-      - name: Setup bioconda-recipes
-        run: |
-          git clone https://github.com/bioconda/bioconda-recipes.git
+        with:
+          repository: Ulthran/bioconda-recipes
+          token: ${{ secrets.BIOCONDA_PR_PAT }}
 
       - name: Setup conda
         uses: s-weigand/setup-conda@v1.2.1
