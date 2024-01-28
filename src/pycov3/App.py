@@ -63,9 +63,9 @@ class Cov3Generator:
                         )
                     mut_line = next(self.sam_generators[name], {})
 
-                next_lines[
-                    name
-                ] = mut_line  # Instead of updating with every iteration of the while loop
+                next_lines[name] = (
+                    mut_line  # Instead of updating with every iteration of the while loop
+                )
                 if coverages:
                     for info in self.__log_cov_info(
                         contig,

@@ -114,10 +114,9 @@ jobs:
 
       - name: Install bioconda-utils
         run: conda create -n bioconda-utils -c conda-forge -c bioconda bioconda-utils
-
       
       - name: Autobump
         run: |
           cd bioconda-recipes/
           source activate bioconda-utils
-          bioconda-utils autobump recipes/ config.yml --commit-as Ulthran ctbushman@gmail.com --check-branch --create-pr --packages pycov3 --dry-run
+          bioconda-utils autobump recipes/ config.yml --commit-as Ulthran ctbushman@gmail.com --check-branch --create-pr --packages pycov3

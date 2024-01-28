@@ -130,4 +130,4 @@ def main(argv=None):
         coverage_params,
     )
 
-    cov3_d.generate(sam_d, fasta_d)
+    cov3_d.generate(sam_d, fasta_d, args.thread_num)
