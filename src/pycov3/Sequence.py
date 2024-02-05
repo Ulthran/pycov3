@@ -97,3 +97,4 @@ class Contig:
             logging.debug(f"Num windows: {len(self.windows)}")
         else:
             self.windows = []
+            logging.debug("Num windows: 0")
