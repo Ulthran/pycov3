@@ -1,5 +1,6 @@
 import logging
 import math
+import sys
 from collections import OrderedDict
 from typing import Dict, Iterator, List, Tuple, Union
 
@@ -44,15 +45,19 @@ class Cov3Generator:
             logging.debug(f"Current contig: {contig_name}")
 
             for name, line in next_lines.items():
+                line_count = 0
                 mut_line = line
                 coverages = {}
                 while True:
                     if not mut_line:
+                        logging.debug(f"SAM {name} exhausted after {line_count} lines")
                         break  # Generator is exhausted
                     if mut_line["reference_name"] == "*":
                         next_lines[name] = {}
+                        logging.debug(f"SAM {name} has no more mapped reads after {line_count} lines")
                         break  # SAM file has no more mapped reads
                     if mut_line["reference_name"] != contig_name:
+                        logging.debug(f"Done with {name} after {line_count} lines")
                         break  # This contig is unmapped by this SAM file
                     if contig.windows:
                         coverages = self.__update_coverages(
@@ -62,6 +67,7 @@ class Cov3Generator:
                             contig.window_step,
                         )
                     mut_line = next(self.sam_generators[name], {})
+                    line_count += 1
 
                 next_lines[name] = (
                     mut_line  # Instead of updating with every iteration of the while loop
@@ -129,7 +135,7 @@ class Cov3Generator:
         cov_step = []
         cov_window_sum = 0
         qualified_info = []  # Information to output
-        n = 0  # Window index
+        n = 0  # Number of windows with < min_cov_window coverage
 
         for step in range(first_step, last_step):
             if step in coverages.keys():
@@ -142,16 +148,27 @@ class Cov3Generator:
                 avg_cov_window = cov_window_sum / window_size
                 window = contig.windows[n]
                 gc_content = window.gc_content
-                n += 1
                 cov_window_sum -= cov_step.pop(0)
-                if avg_cov_window > self.min_cov_window:
+
+                if avg_cov_window < self.min_cov_window:
+                    n += 1
+
+                if avg_cov_window > 0:
                     log_cov = round(math.log(avg_cov_window) / math.log(2), 4)
                     qualified_info.append(
                         {"log_cov": log_cov, "GC_content": gc_content}
                     )
+                else:
+                    log_cov = -1
+                #qualified_info.append(
+                #    {"log_cov": log_cov, "GC_content": gc_content}
+                #)
 
-        if n >= self.min_window_count and len(qualified_info) == n:
+        logging.debug(f"{n} windows with coverage < {self.min_cov_window} ({(n / len(qualified_info)) * 100}% of total)")
+
+        if (len(qualified_info) - n) >= self.min_window_count:
             return qualified_info
+        logging.debug(f"Discarding contig {contig.name} due to insufficient windows with good coverage")
         return []
 
     @staticmethod
