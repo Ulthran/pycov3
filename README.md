@@ -6,7 +6,7 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/a2c7aa4e154d4bae82246d5f950afa9c)](https://app.codacy.com/gh/Ulthran/pycov3/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![PyPI](https://badge.fury.io/py/pycov3.svg)](https://pypi.org/project/pycov3/)
 [![Bioconda](https://anaconda.org/bioconda/pycov3/badges/downloads.svg)](https://anaconda.org/bioconda/pycov3/)
-[![DockerHub](https://img.shields.io/docker/pulls/ctbushman/pycov3)](https://hub.docker.com/repository/docker/ctbushman/pycov3/)
+[![DockerHub](https://img.shields.io/docker/pulls/chopmicrobiome/pycov3)](https://hub.docker.com/repository/docker/chopmicrobiome/pycov3/)
 
 A package for generating cov3 files which are generated from sam files giving coverage information and a fasta file giving binned contigs. Cov3 files are used as input for the [DEMIC R package](https://github.com/Ulthran/DEMIC) which calculates PTR, an estimate for bacterial growth rates.
 
@@ -30,7 +30,7 @@ pycov3 -h
 ### DockerHub
 
 ```bash
-docker pull ctbushman/pycov3:latest
+docker pull chopmicrobiome/pycov3:latest
 docker run --rm --name pycov3 pycov3 pycov3 -h
 ```
 
