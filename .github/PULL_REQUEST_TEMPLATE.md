@@ -8,7 +8,7 @@ _Describe more what you did on changes._
 
 
 
-### Bugfixes :bug: (delete if dind't have any)
+### Bugfixes :bug: (delete if didn't have any)
 
 
 
